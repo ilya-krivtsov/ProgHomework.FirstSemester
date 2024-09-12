@@ -1,30 +1,28 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>
 
-int integerDivision(int numerator, int denominator)
+bool integerDivision(int numerator, int denominator, int *quotient)
 {
     if (denominator == 0)
-    {
-        printf("Denominator cannot be 0!\n");
-        exit(1);
-    }
+        return false;
 
-    int quotient = 0, remainder = numerator, direction = numerator * denominator > 0 ? 1 : -1;
+    int remainder = numerator, direction = numerator * denominator > 0 ? 1 : -1;
 
+    *quotient = 0;
     denominator *= direction;
 
     while (numerator > 0 ? remainder >= denominator : remainder < 0)
     {
-        quotient += direction;
+        *quotient += direction;
         remainder -= denominator;
     }
 
-    return quotient;
+    return true;
 }
 
 int main()
 {
-    int numeratorInput, denominatorInput;
+    int numeratorInput, denominatorInput, divisionResult;
 
     printf("input numerator: ");
     scanf("%d", &numeratorInput);
@@ -32,5 +30,8 @@ int main()
     printf("input denominator: ");
     scanf("%d", &denominatorInput);
 
-    printf("integer division result: %d\n", integerDivision(numeratorInput, denominatorInput));
+    if (integerDivision(numeratorInput, denominatorInput, &divisionResult))
+        printf("integer division result: %d\n", divisionResult);
+    else
+        printf("division failed: denominator was 0\n");
 }

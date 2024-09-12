@@ -12,5 +12,5 @@ int main()
 {
     int array[16] = {0, 1, 2, 3, 0, 0, 8, 9, 0, 0, 0, 1, 2, 3, 4, 0};
 
-    printf("count of zero elements in array is %d\n", countZeroElements(&a[0], 16));
+    printf("count of zero elements in array is %d\n", countZeroElements(array, 16));
 }

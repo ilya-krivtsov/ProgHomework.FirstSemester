@@ -1,24 +1,28 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 int countSubstrings(char *string, char *substring)
 {
-    int count = 0, skipToEnd = 0, skipIteration = 0;
+    int count = 0;
+    bool skipToEnd = false, skipIteration = false;
 
-    for (int i = 0; string[i] != 0; i++)
+    for (int i = 0; string[i] != '\0'; i++)
     {
-        for (int j = 0; substring[j] != 0; j++)
+        skipIteration = false;
+
+        for (int j = 0; substring[j] != '\0'; j++)
         {
             char stringChar = string[i + j];
 
-            if (stringChar == 0)
+            if (stringChar == '\0')
             {
-                skipToEnd = 1;
+                skipToEnd = true;
                 break;
             }
 
             if (stringChar != substring[j])
             {
-                skipIteration = 1;
+                skipIteration = true;
                 break;
             }
         }
@@ -38,9 +42,9 @@ int main()
     char first[256], second[256];
 
     printf("input first string: ");
-    scanf("%s", &first);
+    scanf("%s", first);
     printf("input second string: ");
-    scanf("%s", &second);
+    scanf("%s", second);
 
     printf("\"%s\" appears in \"%s\" %d times\n", second, first, countSubstrings(first, second));
 }
