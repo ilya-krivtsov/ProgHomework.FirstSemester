@@ -1,12 +1,6 @@
 {
     "files.associations": {
-        "cmath": "c",
-        "limits.h": "c",
-        "compare": "c",
-        "stdio.h": "c",
-        "type_traits": "c",
-        "stdlib.h": "c",
-        "stdbool.h": "c"
+        "*.h": "c"
     },
     "files.exclude": {
         "**/.git": true,
