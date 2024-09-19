@@ -26,7 +26,7 @@ long long powerIterative(long long base, long long exponent) {
 
 long long powerNaiive(long long base, long long exponent) {
     long long result = 1;
-    for (int i = 0; i < exponent; i++) {
+    for (int i = 0; i < exponent; ++i) {
         result *= base;
     }
 
