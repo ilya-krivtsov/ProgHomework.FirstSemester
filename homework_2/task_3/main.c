@@ -61,7 +61,7 @@ long long measureTime(void (*sortingAlgoritm)(int *, int), int *array, int array
 }
 
 int main() {
-    const int arrayLength = 100000000;
+    const int arrayLength = 100000;
 
     int *arrayA = calloc(arrayLength, sizeof(int)),
         *arrayB = calloc(arrayLength, sizeof(int));
