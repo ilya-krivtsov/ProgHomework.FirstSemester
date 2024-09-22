@@ -1,37 +1,6 @@
 #include <stdio.h>
 
-long long powerRecursive(long long base, long long exponent) {
-    if (exponent == 0) {
-        return 1;
-    }
-
-    long long result = powerRecursive(base, exponent / 2);
-    result *= result;
-    return exponent % 2 == 0 ? result : result * base;
-}
-
-long long powerIterative(long long base, long long exponent) {
-    long long result = 1;
-
-    while (exponent > 0) {
-        if (exponent % 2 == 1) {
-            result *= base;
-        }
-        exponent /= 2;
-        base *= base;
-    }
-
-    return result;
-}
-
-long long powerNaiive(long long base, long long exponent) {
-    long long result = 1;
-    for (int i = 0; i < exponent; ++i) {
-        result *= base;
-    }
-
-    return result;
-}
+#include "power.h"
 
 int readValue(const char *prompt, const char *incorrectValueMessage) {
     int value;
