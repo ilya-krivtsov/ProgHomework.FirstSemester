@@ -20,28 +20,37 @@ and create `buildConfig.json` in repository root; it should look like this:
 }
 ```
 
-## Build
+## Commands
+
+Commands can be executed in two ways: passed as an argument or
+ran as function from dot sourced script (you have to dot source script only once):
 
 ```ps1
-buildAndTest.ps1 build "homework_x/task_y"
+# argument
+./buildAndTest {command} {task path}
+./buildAndTest {command2} {task path}
+
+# dot-sourced
+. ./buildAndTest
+Cmake-{command} {task path}
+Cmake-{command2} {task path}
 ```
 
-or
+Running task or test also builds it, so you don't have to run both
+`build`/`buildTest` and `run`/`test` commands
+
+### Examples
 
 ```ps1
-. ./buildAndTest.ps1
-CMake-Build "homework_x/task_y"
-```
+# build
+./buildAndTest build "homework_x/task_y"
 
-## Running tests
+# run
+./buildAndTest run "homework_x/task_y"
 
-```ps1
-buildAndTest.ps1 test "homework_x/task_y"
-```
+# build test
+./buildAndTest buildTest "homework_x/task_y"
 
-or
-
-```ps1
-. ./buildAndTest.ps1
-CMake-Test "homework_x/task_y"
+# run test
+./buildAndTest test "homework_x/task_y"
 ```
