@@ -41,6 +41,7 @@ function Run-Command($command, $commandArgs)
     }
     $p = [System.Diagnostics.Process]::Start($opt)
     $p.WaitForExit()
+    if ($p.ExitCode -ne 0) { exit $p.ExitCode }
 }
 
 if ($args.Count -ne 2)
