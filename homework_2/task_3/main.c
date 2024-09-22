@@ -20,7 +20,7 @@ long long measureTime(void (*sortingAlgoritm)(int *, int), int *array, int array
     return (endTime.tv_nsec - startTime.tv_nsec) + (endTime.tv_sec - startTime.tv_sec) * 1000 * 1000 * 1000;
 }
 
-int main() {
+int main(void) {
     const int arrayLength = 100000;
 
     int *arrayA = calloc(arrayLength, sizeof(int)),
