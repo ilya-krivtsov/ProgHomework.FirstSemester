@@ -10,7 +10,7 @@ git submodule update --init
 
 and create `buildConfig.json` in repository root; it should look like this:
 
-```json
+```jsonc
 {
     "c_compiler": "C compiler path",
     "cxx_compiler": "C++ compiler path",
