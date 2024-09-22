@@ -4,7 +4,7 @@ $buildDirectory = [System.IO.Path]::Combine($root, "build")
 
 $config = Get-Content buildConfig.json | ConvertFrom-Json
 
-$cCompiler = $config.c_compiler
+$compiler = $config.compiler
 $generator = $config.generator
 $cmake = $config.cmake
 $executableExtension = $config.executableExtension
@@ -14,7 +14,7 @@ function CMake-Build($path, $target)
     Remove-Item -Force ([System.IO.Path]::Combine($buildDirectory, "CMakeCache.txt"))
     Remove-Item -Recurse -Force ([System.IO.Path]::Combine($buildDirectory, "CMakeFiles"))
     Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=Debug",
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE", "-DCMAKE_C_COMPILER:FILEPATH=$cCompiler",
+        "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
         "-S$([System.IO.Path]::Combine($root, $path))", "-B$buildDirectory", "-G", "`"$generator`"")
     Run-Command "$cmake" @("--build", $buildDirectory, "--config", "Debug", "--target", "$target", "-j", "14")
 }
@@ -83,4 +83,3 @@ Switch ($command)
     'test' { CMake-Test -path $path -target $target }
     'buildTest' { CMake-BuildTest -path $path -target $target }
 }
-
