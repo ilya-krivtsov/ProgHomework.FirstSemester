@@ -47,6 +47,12 @@ function Run-Command($command, $commandArgs)
     if ($p.ExitCode -ne 0) { exit 1 }
 }
 
+$isDotSourced = $MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq ''
+if ($isDotSourced)
+{
+    exit
+}
+
 if ($args.Count -ne 2)
 {
     Write-Error "Expected command (build / run / test / buildTest) and path to task"
