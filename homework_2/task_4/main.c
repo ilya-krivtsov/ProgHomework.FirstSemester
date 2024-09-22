@@ -11,10 +11,8 @@ void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
     }
 }
 
-void printArray(int *array, int length)
-{
-    for (int i = 0; i < length; i++)
-    {
+void printArray(int *array, int length) {
+    for (int i = 0; i < length; ++i) {
         printf("%d", array[i]);
         if (i != length - 1)
             printf(", ");
