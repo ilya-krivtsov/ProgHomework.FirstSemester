@@ -13,7 +13,6 @@ and create `buildConfig.json` in repository root; it should look like this:
 ```jsonc
 {
     "c_compiler": "C compiler path",
-    "cxx_compiler": "C++ compiler path",
     "generator": "CMake generator",
     "cmake": "CMake path",
     "executableExtension": "executable files extension" // set to ".exe" on Windows and to "" on Unix-like systems
