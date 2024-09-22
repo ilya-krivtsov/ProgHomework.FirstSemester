@@ -17,8 +17,8 @@ void testExponentIsZero(power power) {
     ASSERT_EQUAL(power(2, 0), 1);
     ASSERT_EQUAL(power(4, 0), 1);
     ASSERT_EQUAL(power(100, 0), 1);
-    ASSERT_EQUAL(power(100000, 0), 1);
-    ASSERT_EQUAL(power(10000000, 0), 1);
+    ASSERT_EQUAL(power(10'000, 0), 1);
+    ASSERT_EQUAL(power(1'000'000, 0), 1);
 }
 
 void testBaseIsZero(power power) {

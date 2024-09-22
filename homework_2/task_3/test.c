@@ -60,10 +60,10 @@ void testEverything(sort sort) {
     test20ElementsSameValuesArray(sort);
 }
 
-CTEST(sortingTest, countingSortTest) {
+CTEST(sortingTests, countingSortTest) {
     testEverything(countingSort);
 }
 
-CTEST(sortingTest, bubbleSortTest) {
+CTEST(sortingTests, bubbleSortTest) {
     testEverything(bubbleSort);
 }
