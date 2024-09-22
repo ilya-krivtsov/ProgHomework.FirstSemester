@@ -1,49 +1,9 @@
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#define VALUE_MIN -4096
-#define VALUE_MAX 4095
-#define VALUES_COUNT (VALUE_MAX - VALUE_MIN)
-
-void countingSort(int *array, int arrayLength) {
-    int *countingArray = calloc(VALUES_COUNT, sizeof(int));
-
-    for (int i = 0; i < arrayLength; ++i) {
-        ++countingArray[array[i] - VALUE_MIN];
-    }
-
-    int arrayPointer = 0;
-
-    for (int i = 0; i < VALUES_COUNT; ++i) {
-        int count = countingArray[i];
-        for (int k = 0; k < count; ++k) {
-            array[arrayPointer] = i + VALUE_MIN;
-            ++arrayPointer;
-        }
-    }
-}
-
-void bubbleSort(int *array, int arrayLength) {
-    for (int i = 0; i < arrayLength; ++i) {
-        bool swappedAny = false;
-        for (int j = arrayLength - 1; j > i; --j) {
-            if (array[j - 1] > array[j]) {
-                swappedAny = true;
-
-                int t = array[j - 1];
-                array[j - 1] = array[j];
-                array[j] = t;
-            }
-        }
-
-        if (!swappedAny) {
-            break;
-        }
-    }
-}
+#include "sortings.h"
 
 void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
     for (int i = 0; i < arrayLength; ++i) {
