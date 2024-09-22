@@ -27,6 +27,11 @@ function CMake-Run($path, $target)
     Run-Command ([System.IO.Path]::Combine($buildDirectory, "$target$executableExtension"))
 }
 
+function CMake-BuildTest($path, $target)
+{
+    CMake-Build $path "$($target)_test"
+}
+
 function CMake-Test($path, $target)
 {
     CMake-Run $path "$($target)_test"
@@ -46,14 +51,15 @@ function Run-Command($command, $commandArgs)
 
 if ($args.Count -ne 2)
 {
-    Write-Error "Expected command (build / run / test) and path to task"
+    Write-Error "Expected command (build / run / test / buildTest) and path to task"
     exit 1
 }
 
+$allowedCommands = 'build', 'run', 'test', 'buildTest'
 $command = $args[0]
-if (($command -ne 'build') -and ($command -ne 'run') -and ($command -ne 'test'))
+if (-not $allowedCommands.Contains($command))
 {
-    Write-Error "Command name (build / run / test) expected"
+    Write-Error "Command name (build / run / test / buildTest) expected"
     exit 1
 }
 
@@ -71,5 +77,6 @@ Switch ($command)
     'build' { CMake-Build -path $path -target $target }
     'run' { CMake-Run -path $path -target $target }
     'test' { CMake-Test -path $path -target $target }
+    'buildTest' { CMake-BuildTest -path $path -target $target }
 }
 
