@@ -2,107 +2,32 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
-#include <stdio.h>
-#include <stdbool.h>
-
-#include "halfQSort.h"
+#include "fib.h"
 
 int main(int argc, const char *argv[]) {
     return ctest_main(argc, argv);
 }
 
-void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
-    for (int i = 0; i < arrayLength; ++i) {
-        array[i] = rand() * (maxValue - minValue) / RAND_MAX + minValue;
-    }
+typedef uint64_t(*fib)(uint64_t);
+
+void test(fib fib) {
+    ASSERT_EQUAL(fib(0), 0);
+    ASSERT_EQUAL(fib(1), 1);
+    ASSERT_EQUAL(fib(2), 1);
+    ASSERT_EQUAL(fib(3), 2);
+    ASSERT_EQUAL(fib(4), 3);
+    ASSERT_EQUAL(fib(5), 5);
+    ASSERT_EQUAL(fib(6), 8);
+    ASSERT_EQUAL(fib(7), 13);
+    ASSERT_EQUAL(fib(8), 21);
+    ASSERT_EQUAL(fib(9), 34);
+    ASSERT_EQUAL(fib(10), 55);
 }
 
-void assertHalfSorted(int *array, int arrayLength, int firstElement) {
-    bool reachedHalf = false;
-    for (int i = 0; i < arrayLength; ++i) {
-        int element = array[i];
-        if (element == firstElement) {
-            reachedHalf = true;
-        }
-        if (reachedHalf) {
-            ASSERT_GE(array[i], firstElement);
-        } else {
-            ASSERT_LT(array[i], firstElement);
-        }
-    }
+CTEST(powerTests, fibonacciIterativeTest) {
+    test(fibonacciIterative);
 }
 
-void testArray(int *array, int arrayLength) {
-    int firstElement = array[0];
-    halfQSort(array, arrayLength);
-    assertHalfSorted(array, arrayLength, firstElement);
+CTEST(powerTests, fibonacciRecursiveTest) {
+    test(fibonacciRecursive);
 }
-
-CTEST(halfQSortTests, emptyArrayTest) {
-    halfQSort(NULL, 0);
-}
-
-CTEST(halfQSortTests, constantArrayTest_FirstElementWillBeFirst) {
-#define size 8
-    int array[size] = { 4, 6, 7, 5, 8, 10, 9, 24 };
-
-    testArray(array, size);
-#undef size
-}
-
-CTEST(halfQSortTests, constantArrayTest_FirstElementWillBeLast) {
-#define size 8
-    int array[size] = { 44, 6, 7, 5, 8, 10, 9, 24 };
-
-    testArray(array, size);
-#undef size
-}
-
-CTEST(halfQSortTests, constantArrayTest_FirstElementWillBeInMiddle_A) {
-#define size 8
-    int array[size] = { 4, 6, 2, 5, -1, 10, 9, 0 };
-
-    testArray(array, size);
-#undef size
-}
-
-CTEST(halfQSortTests, constantArrayTest_FirstElementWillBeInMiddle_B) {
-#define size 8
-    int array[size] = { 4, 0, 23, 6, -3, 10, 2, 14 };
-
-    testArray(array, size);
-#undef size
-}
-
-CTEST(halfQSortTests, dynamicArrayTest_A) {
-#define size 8
-    int array[size];
-    randomizeArray(array, size, -2048, 2048);
-    testArray(array, size);
-#undef size
-}
-
-CTEST(halfQSortTests, dynamicArrayTest_B) {
-#define size 16
-    int array[size];
-
-    const int iterations = 8;
-    for (int i = 0; i < iterations; ++i) {
-        randomizeArray(array, size, -2048, 2048);
-        testArray(array, size);
-    }
-#undef size
-}
-
-CTEST(halfQSortTests, dynamicArrayTest_C) {
-#define size 64
-    int array[size];
-
-    const int iterations = 16;
-    for (int i = 0; i < iterations; ++i) {
-        randomizeArray(array, size, -2048, 2048);
-        testArray(array, size);
-    }
-#undef size
-}
-

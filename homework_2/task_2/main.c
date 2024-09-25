@@ -1,21 +1,35 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
-#include "power.h"
+#include "sortings.h"
 
-int readValue(const char *prompt, const char *incorrectValueMessage) {
-    int value;
-    printf(prompt);
-    while ((scanf("%d", &value) != 1) || value < 0) {
-        while (getchar() != '\n') {}
-        printf(incorrectValueMessage);
+void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
+    for (int i = 0; i < arrayLength; ++i) {
+        array[i] = rand() * (maxValue - minValue) / RAND_MAX + minValue;
     }
 }
 
-int main(void) {
-    int base = readValue("enter base: ", "incorrect value: base cannot be less than zero; try again: ");
-    int exponent = readValue("enter exponent: ", "incorrect value: exponent cannot be less than zero; try again: ");
+// returns time in nanoseconds
+long long measureTime(void (*sortingAlgoritm)(int *, int), int *array, int arrayLength) {
+    struct timespec startTime, endTime;
+    clock_gettime(CLOCK_MONOTONIC, &startTime);
+    sortingAlgoritm(array, arrayLength);
+    clock_gettime(CLOCK_MONOTONIC, &endTime);
+    return (endTime.tv_nsec - startTime.tv_nsec) + (endTime.tv_sec - startTime.tv_sec) * 1000 * 1000 * 1000;
+}
 
-    printf("%d ^ %d = %lld (recursive: O(log n))\n", base, exponent, powerRecursive(base, exponent));
-    printf("%d ^ %d = %lld (iterative: O(log n))\n", base, exponent, powerIterative(base, exponent));
-    printf("%d ^ %d = %lld (naiive: O(n))\n", base, exponent, powerNaiive(base, exponent));
+int main(void) {
+    const int arrayLength = 100000;
+
+    int *arrayA = calloc(arrayLength, sizeof(int)),
+        *arrayB = calloc(arrayLength, sizeof(int));
+
+    srand(time(NULL));
+    randomizeArray(arrayA, arrayLength, VALUE_MIN, VALUE_MAX);
+    arrayB = memcpy(arrayB, arrayA, arrayLength * sizeof(int));
+
+    printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureTime(countingSort, arrayA, arrayLength) / 1000.0);
+    printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureTime(bubbleSort, arrayA, arrayLength) / 1000.0);
 }

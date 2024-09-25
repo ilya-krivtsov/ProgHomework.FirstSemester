@@ -4,10 +4,10 @@ project(task_3 LANGUAGES C)
 set(CMAKE_C_STANDARD 23)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-add_library(sortings sortings.c)
+add_library(power power.c)
 
 add_executable(task_3 main.c)
-target_link_libraries(task_3 PRIVATE sortings)
+target_link_libraries(task_3 PRIVATE power)
 
 add_executable(task_3_test test.c)
-target_link_libraries(task_3_test PRIVATE sortings)
+target_link_libraries(task_3_test PRIVATE power)

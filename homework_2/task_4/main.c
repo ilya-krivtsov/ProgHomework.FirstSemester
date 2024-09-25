@@ -1,47 +1,35 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <time.h>
 
-#include "halfQSort.h"
+#include "fib.h"
 
-void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
-    for (int i = 0; i < arrayLength; ++i) {
-        array[i] = rand() * (maxValue - minValue) / RAND_MAX + minValue;
-    }
-}
-
-void printArray(int *array, int length) {
-    for (int i = 0; i < length; ++i) {
-        printf("%d", array[i]);
-        if (i != length - 1)
-            printf(", ");
-    }
-    printf("\n");
-}
-
-int readValue(const char *prompt, const char *incorrectValueMessage) {
-    int value;
-    printf(prompt);
-    while ((scanf("%d", &value) != 1) || value < 0) {
-        while (getchar() != '\n') {}
-        printf(incorrectValueMessage);
-    }
+// returns time in nanoseconds
+uint64_t measureTime(uint64_t(*fib)(uint64_t), int n) {
+    struct timespec startTime, endTime;
+    clock_gettime(CLOCK_MONOTONIC, &startTime);
+    fib(n);
+    clock_gettime(CLOCK_MONOTONIC, &endTime);
+    return (endTime.tv_nsec - startTime.tv_nsec) + (endTime.tv_sec - startTime.tv_sec) * 1000 * 1000 * 1000;
 }
 
 int main(void) {
-    int arrayLength = readValue("enter array length: ", "incorrect value: array length cannot be less than zero; try again: ");
+    const int maxIteration = 200;
+    for (int i = 0; i <= maxIteration; ++i) {
+        uint64_t n = i;
 
-    int *array = calloc(arrayLength, sizeof(int));
+        double iterativeTimeMillis = measureTime(fibonacciIterative, n) / 1000.0 / 1000.0;
+        double recursiveTimeMillis = measureTime(fibonacciRecursive, n) / 1000.0 / 1000.0;
 
-    srand(time(NULL));
-    randomizeArray(array, arrayLength, -4096, 4096);
+        // consider that function A is noticeably slower than function B if
+        // A executes more at least twice as slow as B and takes more than 500 ms
+        if ((recursiveTimeMillis / iterativeTimeMillis) > 2 && recursiveTimeMillis > 500.0) {
+            printf("recusive algorithm is noticeably slower than iterative at iteration %d:\n", n);
+            printf("fibonacciIterative took %.2f ms;\n", iterativeTimeMillis);
+            printf("fibonacciRecursive took %.2f ms\n", recursiveTimeMillis);
 
-    printf("array before halfQSort:\n");
-    printArray(array, arrayLength);
+            return 0;
+        }
+    }
 
-    halfQSort(array, arrayLength);
-
-    printf("array after halfQSort:\n");
-    printArray(array, arrayLength);
+    printf("recursive algorithm wasn't much slower than iterative in range of values [0, %d]\n", maxIteration);
 }
