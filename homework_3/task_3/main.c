@@ -30,16 +30,18 @@ long long measureTime(void (*sort)(int *, int), int *array, int arrayLength) {
 int main(void) {
     int arrayLength = readValue("enter array length: ", "incorrect value: array length cannot be less than zero; try again: ");
 
-    int *array = calloc(arrayLength, sizeof(int));
+    int *arrayA = calloc(arrayLength, sizeof(int)),
+        *arrayB = calloc(arrayLength, sizeof(int));
 
     srand(time(NULL));
-    randomizeArray(array, arrayLength, 0, 128);
+    randomizeArray(arrayA, arrayLength, 0, 1024);
+    arrayB = memcpy(arrayB, arrayA, arrayLength * sizeof(int));
 
-    printf("qsort:       %.2f ms\n", measureTime(quickSort, array, arrayLength) / 1000.0 / 1000.0);
+    srand(time(NULL));
 
-    randomizeArray(array, arrayLength, 0, 128);
+    printf("qsort:       %.2f ms\n", measureTime(quickSort, arrayA, arrayLength) / 1000.0 / 1000.0);
+    printf("smart qsort: %.2f ms\n", measureTime(smartQuickSort, arrayB, arrayLength) / 1000.0 / 1000.0);
 
-    printf("smart qsort: %.2f ms\n", measureTime(smartQuickSort, array, arrayLength) / 1000.0 / 1000.0);
-
-    free(array);
+    free(arrayA);
+    free(arrayB);
 }
