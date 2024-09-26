@@ -37,8 +37,6 @@ int main(void) {
     randomizeArray(arrayA, arrayLength, 0, 1024);
     arrayB = memcpy(arrayB, arrayA, arrayLength * sizeof(int));
 
-    srand(time(NULL));
-
     printf("qsort:       %.2f ms\n", measureTime(quickSort, arrayA, arrayLength) / 1000.0 / 1000.0);
     printf("smart qsort: %.2f ms\n", measureTime(smartQuickSort, arrayB, arrayLength) / 1000.0 / 1000.0);
 
