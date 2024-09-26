@@ -32,4 +32,7 @@ int main(void) {
 
     printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureTime(countingSort, arrayA, arrayLength) / 1000.0);
     printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureTime(bubbleSort, arrayA, arrayLength) / 1000.0);
+
+    free(arrayA);
+    free(arrayB);
 }

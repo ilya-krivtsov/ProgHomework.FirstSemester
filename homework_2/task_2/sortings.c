@@ -19,6 +19,8 @@ void countingSort(int *array, int arrayLength) {
             ++arrayPointer;
         }
     }
+
+    free(countingArray);
 }
 
 void bubbleSort(int *array, int arrayLength) {

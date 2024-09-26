@@ -44,4 +44,6 @@ int main(void) {
 
     printf("array after halfQSort:\n");
     printArray(array, arrayLength);
+
+    free(array);
 }
