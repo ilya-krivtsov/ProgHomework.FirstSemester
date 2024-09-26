@@ -23,26 +23,28 @@ while IFS="=" read -r var value; do
 done < config.txt
 unset IFS
 
-function build {
-    echo "dir: $1"
-    echo "target: $2"
+function buildInternal {
     $cmake -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -DCMAKE_C_COMPILER:FILEPATH=$compiler -S$1 -B./build -G "$generator"
     $cmake --build ./build --config Debug --target $2 -j 14
 }
 
+function build {
+    buildInternal $1 $(basename -- "$1")
+}
+
 function run {
-    build $1 $(basename -- "$1")
+    buildInternal $1 $(basename -- "$1")
     ./build/$(basename -- "$1")$executable_extension
 }
 
 function buildTest {
     target=$(basename -- "$1")_test
-    build $1 $target
+    buildInternal $1 $target
 }
 
 function test {
     target=$(basename -- "$1")_test
-    build $1 $target
+    buildInternal $1 $target
     ./build/$target$executable_extension
 }
 
