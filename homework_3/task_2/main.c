@@ -44,4 +44,6 @@ int main(void) {
     }
 
     printf("out of %d randomly generated numbers %d %s in the array\n", numbersToCheckCount, foundNumbers, foundNumbers == 1 ? "was" : "were");
+
+    free(array);
 }

@@ -33,4 +33,6 @@ int main(void) {
     } else {
         printf("unknown error\n");
     }
+
+    free(array);
 }
