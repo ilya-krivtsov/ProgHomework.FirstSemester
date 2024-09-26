@@ -31,7 +31,7 @@ int main(void) {
     if (findMostFrequentElement(array, arrayLength, &mostFrequentElement, &occurrences)) {
         printf("most frequent element is %d; it appears %d times in array", mostFrequentElement, occurrences);
     } else {
-        printf("unknown error\n");
+        printf("couldn't find most frequent element: the array is empty\n");
     }
 
     free(array);
