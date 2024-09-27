@@ -2,37 +2,75 @@ $root = $PSScriptRoot
 
 $buildDirectory = [System.IO.Path]::Combine($root, "build")
 
-$config = Get-Content buildConfig.json | ConvertFrom-Json
+$cmake = 'undefinedCmake'
+$compiler = 'undefinedCompiler'
+$generator = 'undefinedGenerator'
+$executableExtension = 'undefinedExecutableExtension'
 
-$compiler = $config.compiler
-$generator = $config.generator
-$cmake = $config.cmake
-$executableExtension = $config.executableExtension
-
-function CMake-Build($path, $target)
+foreach($line in Get-Content config.txt) 
 {
-    Remove-Item -Force ([System.IO.Path]::Combine($buildDirectory, "CMakeCache.txt"))
-    Remove-Item -Recurse -Force ([System.IO.Path]::Combine($buildDirectory, "CMakeFiles"))
-    Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=Debug",
-        "-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
-        "-S$([System.IO.Path]::Combine($root, $path))", "-B$buildDirectory", "-G", "`"$generator`"")
-    Run-Command "$cmake" @("--build", $buildDirectory, "--config", "Debug", "--target", "$target", "-j", "14")
+    $key, $value = $line.Split('=')
+    switch ($key)
+    {
+        'cmake' { $cmake = $value }        
+        'compiler' { $compiler = $value }        
+        'generator' { $generator = $value }        
+        'executable_extension' { $executableExtension = $value }        
+    }
 }
 
-function CMake-Run($path, $target)
+if ($cmake -eq 'undefinedCmake')
 {
-    CMake-Build $path $target
-    Run-Command ([System.IO.Path]::Combine($buildDirectory, "$target$executableExtension"))
+    Write-Error "cmake not unspecified"
+    exit 1
 }
 
-function CMake-BuildTest($path, $target)
+if ($compiler -eq 'undefinedCompiler')
 {
-    CMake-Build $path "$($target)_test"
+    Write-Error "compiler not unspecified"
+    exit 1
 }
 
-function CMake-Test($path, $target)
+if ($generator -eq 'undefinedGenerator')
 {
-    CMake-Run $path "$($target)_test"
+    Write-Error "generator not unspecified"
+    exit 1
+}
+
+if ($executableExtension -eq 'undefinedExecutableExtension')
+{
+    Write-Host "warning: executable extension not specified - assuming there is no executable extension"
+    $executableExtension = ''
+}
+
+function CMake-BuildInternal($source, $target, $configuration)
+{
+    Remove-Item -Recurse -Force -ErrorAction Ignore $buildDirectory
+    Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=$configuration", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
+        "-S$([System.IO.Path]::Combine($root, $source))", "-B$buildDirectory", "-G", "`"$generator`"")
+    Run-Command "$cmake" @("--build", $buildDirectory, "--config", $configuration, "--target", "$target", "-j", "14")
+}
+
+function CMake-Build($homework, $task, $configuration)
+{
+    CMake-BuildInternal "$homework/$task" $task $configuration
+}
+
+function CMake-Run($homework, $task, $configuration)
+{
+    CMake-BuildInternal "$homework/$task" $task $configuration
+    Run-Command ([System.IO.Path]::Combine($buildDirectory, "$task$executableExtension"))
+}
+
+function CMake-BuildTest($homework, $task, $configuration)
+{
+    CMake-BuildInternal "$homework/$task" "$($task)_test" $configuration
+}
+
+function CMake-Test($homework, $task, $configuration)
+{
+    CMake-BuildInternal "$homework/$task" "$($task)_test" $configuration
+    Run-Command ([System.IO.Path]::Combine($buildDirectory, "$($task)_test$executableExtension"))
 }
 
 function Run-Command($command, $commandArgs)
@@ -53,33 +91,63 @@ if ($isDotSourced)
     exit
 }
 
-if ($args.Count -ne 2)
+$configuration = 'Debug'
+$command = 'undefined_command'
+for ($i = 0; $i -lt $args.Count; $i++)
 {
-    Write-Error "Expected command (build / run / test / buildTest) and path to task"
+    $arg = $args[$i]
+    switch -Regex ($arg)
+    {
+        'build|run|buildTest|test'
+        {
+            $command=$arg
+            $i++
+
+            if ($i -ge $args.Count)
+            {
+                Write-Error "no homework folder specified"
+                exit 1
+            }
+
+            $homework = $args[$i]
+            if (-not (Test-Path -Path "$homework" -PathType Container))
+            {
+                Write-Error "Homework folder '$homework' not found"
+                exit 1
+            }
+            $i++
+
+            if ($i -ge $args.Count)
+            {
+                Write-Error "no task folder specified"
+                exit 1
+            }
+
+            $task = $args[$i]
+            if (-not (Test-Path -Path "$homework/$task" -PathType Container))
+            {
+                Write-Error "task folder '$task' not found in homework folder '$homework'"
+                exit 1
+            }
+        }
+        '-r|--release' { $configuration='Release' }
+        '-d|--debug' { $configuration='Debug' }
+        '-c|--clear' { Remove-Item -Recurse -Force -ErrorAction Ignore ./build }
+        'clear' { Remove-Item -Recurse -Force -ErrorAction Ignore ./build; exit 0 }
+        default  { Write-Error "unknown argument: $arg"; exit 1 }
+    }
+}
+
+if ($command -eq 'undefined_command' )
+{
+    Write-Error "command not specified"
     exit 1
 }
 
-$allowedCommands = 'build', 'run', 'test', 'buildTest'
-$command = $args[0]
-if (-not $allowedCommands.Contains($command))
+switch ($command)
 {
-    Write-Error "Command name (build / run / test / buildTest) expected"
-    exit 1
-}
-
-$path = $args[1]
-
-if (-not [System.IO.Directory]::Exists([System.IO.Path]::Combine($root, $path)))
-{
-    Write-Error "Path '$path' do not exist"
-    exit 1
-}
-
-$target = [System.IO.Path]::GetFilename($path)
-Switch ($command)
-{
-    'build' { CMake-Build -path $path -target $target }
-    'run' { CMake-Run -path $path -target $target }
-    'test' { CMake-Test -path $path -target $target }
-    'buildTest' { CMake-BuildTest -path $path -target $target }
+    build { Cmake-Build $homework $task $configuration }
+    run { Cmake-Run $homework $task $configuration }
+    buildTest { CMake-BuildTest $homework $task $configuration }
+    test { CMake-Test $homework $task $configuration }
 }
