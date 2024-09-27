@@ -98,6 +98,7 @@ while [[ "$#" -gt 0 ]]; do
             ;;
         -r|--release) configuration='Release' ;;
         -d|--debug) configuration='Debug' ;;
+        -c|--clear) rm -rf ./build; ;;
         clear) rm -rf ./build; exit 0 ;;
         *) echo "unknown argument: $1"; exit 1 ;;
     esac
