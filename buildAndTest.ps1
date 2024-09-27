@@ -7,15 +7,15 @@ $compiler = 'undefinedCompiler'
 $generator = 'undefinedGenerator'
 $executableExtension = 'undefinedExecutableExtension'
 
-foreach($line in Get-Content config.txt) 
+foreach ($line in Get-Content config.txt)
 {
     $key, $value = $line.Split('=')
     switch ($key)
     {
-        'cmake' { $cmake = $value }        
-        'compiler' { $compiler = $value }        
-        'generator' { $generator = $value }        
-        'executable_extension' { $executableExtension = $value }        
+        'cmake' { $cmake = $value }
+        'compiler' { $compiler = $value }
+        'generator' { $generator = $value }
+        'executable_extension' { $executableExtension = $value }
     }
 }
 
@@ -43,46 +43,89 @@ if ($executableExtension -eq 'undefinedExecutableExtension')
     $executableExtension = ''
 }
 
-function CMake-BuildInternal($source, $target, $configuration)
-{
-    Remove-Item -Recurse -Force -ErrorAction Ignore $buildDirectory
-    Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=$configuration", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
-        "-S$([System.IO.Path]::Combine($root, $source))", "-B$buildDirectory", "-G", "`"$generator`"")
-    Run-Command "$cmake" @("--build", $buildDirectory, "--config", $configuration, "--target", "$target", "-j", "14")
-}
-
-function CMake-Build($homework, $task, $configuration)
-{
-    CMake-BuildInternal "$homework/$task" $task $configuration
-}
-
-function CMake-Run($homework, $task, $configuration)
-{
-    CMake-BuildInternal "$homework/$task" $task $configuration
-    Run-Command ([System.IO.Path]::Combine($buildDirectory, "$task$executableExtension"))
-}
-
-function CMake-BuildTest($homework, $task, $configuration)
-{
-    CMake-BuildInternal "$homework/$task" "$($task)_test" $configuration
-}
-
-function CMake-Test($homework, $task, $configuration)
-{
-    CMake-BuildInternal "$homework/$task" "$($task)_test" $configuration
-    Run-Command ([System.IO.Path]::Combine($buildDirectory, "$($task)_test$executableExtension"))
-}
-
-function Run-Command($command, $commandArgs)
+function Run-Command($command, $commandArgs, $workingDirectory)
 {
     $opt = [System.Diagnostics.ProcessStartInfo]@{
         Arguments = $commandArgs
-        WorkingDirectory = $pwd
+        WorkingDirectory = $workingDirectory
         Filename = $command
     }
     $p = [System.Diagnostics.Process]::Start($opt)
     $p.WaitForExit()
     if ($p.ExitCode -ne 0) { exit 1 }
+}
+
+function CMake-BuildInternal($target, $configuration)
+{
+    $configurationCacheFile = "$buildDirectory/__last_configuration"
+    $lastConfiguration = 'none'
+
+    if (-not (Test-Path -Path $buildDirectory -PathType Container))
+    {
+        New-Item -ItemType Directory $buildDirectory | Out-Null
+    }
+    elseif (Test-Path -Path $configurationCacheFile -PathType Leaf)
+    {
+        $lastConfiguration = Get-Content $configurationCacheFile
+    }
+
+    if ($configuration -ne $lastConfiguration)
+    {
+        Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=$configuration", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
+            "-S", $root, "-B", $buildDirectory, "-G", "`"$generator`"")
+
+        $configuration | Out-File $configurationCacheFile
+    }
+
+    Run-Command "$cmake" @("--build", $buildDirectory, "--config", $configuration, "--target", $target, "-j", "14")
+}
+
+function CMake-RunInternal($homework, $task, $target)
+{
+    Run-Command "$buildDirectory/$homework/$task/$target$executableExtension" @() "$root/$homework/$task"
+}
+
+function CMake-Build($homework, $task, $configuration)
+{
+    CMake-BuildInternal "$($homework)_$task" $configuration
+}
+
+function CMake-Run($homework, $task, $configuration)
+{
+    CMake-Build $homework $task $configuration
+    CMake-RunInternal $homework $task "$($homework)_$task"
+}
+
+function CMake-BuildTest($homework, $task, $configuration)
+{
+    CMake-BuildInternal "$($homework)_$($task)_test" $configuration
+}
+
+function CMake-Test($homework, $task, $configuration)
+{
+    CMake-BuildTest $homework $task $configuration
+    CMake-RunInternal $homework $task "$($homework)_$($task)_test"
+}
+
+function DoForeach-HomeworkAndTask($toRun, $configuration)
+{
+    foreach ($homework in Get-ChildItem -Filter "homework_*")
+    {
+        foreach ($task in Get-ChildItem $homework -Filter "task_*")
+        {
+            & $toRun $homework.Name $task.Name $configuration
+        }
+    }
+}
+
+function CMake-BuildAll($configuration)
+{
+    DoForeach-HomeworkAndTask CMake-Build $configuration
+}
+
+function CMake-TestAll($configuration)
+{
+    DoForeach-HomeworkAndTask CMake-Test $configuration
 }
 
 $isDotSourced = $MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq ''
@@ -98,9 +141,9 @@ for ($i = 0; $i -lt $args.Count; $i++)
     $arg = $args[$i]
     switch -Regex ($arg)
     {
-        'build|run|buildTest|test'
+        { ($_ -eq 'build') -or ($_ -eq 'run') -or ($_ -eq 'buildTest') -or ($_ -eq 'test') }
         {
-            $command=$arg
+            $command = $arg
             $i++
 
             if ($i -ge $args.Count)
@@ -130,9 +173,10 @@ for ($i = 0; $i -lt $args.Count; $i++)
                 exit 1
             }
         }
-        '-r|--release' { $configuration='Release' }
-        '-d|--debug' { $configuration='Debug' }
-        '-c|--clear' { Remove-Item -Recurse -Force -ErrorAction Ignore ./build }
+        { ($_ -eq 'buildAll') -or ($_ -eq 'testAll') } { $command = $arg }
+        { ($_ -eq '-r') -or ($_ -eq '--release') } { $configuration = 'Release' }
+        { ($_ -eq '-d') -or ($_ -eq '--debug') } { $configuration = 'Debug' }
+        { ($_ -eq '-c') -or ($_ -eq '--clear') } { Remove-Item -Recurse -Force -ErrorAction Ignore ./build }
         'clear' { Remove-Item -Recurse -Force -ErrorAction Ignore ./build; exit 0 }
         default  { Write-Error "unknown argument: $arg"; exit 1 }
     }
@@ -150,4 +194,6 @@ switch ($command)
     run { Cmake-Run $homework $task $configuration }
     buildTest { CMake-BuildTest $homework $task $configuration }
     test { CMake-Test $homework $task $configuration }
+    buildAll { CMake-BuildAll $configuration }
+    testAll { CMake-TestAll $configuration }
 }
