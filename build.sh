@@ -1,5 +1,7 @@
 #!/bin/bash
 
+build_dir='build'
+
 cmake='undefined_cmake'
 compiler='undefined_compiler'
 generator='undefined_generator'
@@ -32,44 +34,103 @@ fi
 
 if [[ $executable_extension = 'undefined_executable_extension' ]]; then
     echo "warning: executable extension not specified - assuming there is no executable extension"
-    executable_extension=
+    executable_extension=''
 fi
 
-function buildInternal {
-    $cmake -DCMAKE_BUILD_TYPE:STRING=$3 -DCMAKE_C_COMPILER:FILEPATH=$compiler -S$1 -B./build -G "$generator"
-    if [[ $? -ne 0 ]]; then
-        exit 1
+# $1: target to build
+# $2: configuration
+function build_internal {
+    configure=false
+    configuration_cache_file="$build_dir/__last_configuration"
+    last_configuration='none'
+    if [[ ! -d $build_dir ]]; then
+        mkdir "$build_dir"
+    else
+        if [[ -f $configuration_cache_file ]]; then
+            last_configuration=$(<$configuration_cache_file)
+        fi
     fi
-    
-    $cmake --build ./build --config $3 --target $2 -j 14
+
+    if [[ $2 != $last_configuration ]]; then
+        $cmake -DCMAKE_BUILD_TYPE:STRING=$2 -DCMAKE_C_COMPILER:FILEPATH=$compiler -S . -B "$build_dir" -G "$generator"
+        if [[ $? -ne 0 ]]; then
+            exit 1
+        fi
+
+        echo $2 > $configuration_cache_file
+    fi
+
+    $cmake --build "$build_dir" --config $2 --target $1 -j 14
     if [[ $? -ne 0 ]]; then
         exit 1
     fi
 }
 
+# $1: homework
+# $2: task
+# $3: target
+function run_internal {
+    build/$1/$2/$3$executable_extension
+}
+
+# build, run, buildTest and test have these arguments:
+# $1: homework
+# $2: task
+# $3: configuration
+
 function build {
-    buildInternal "$1/$2" $2 $3
+    build_internal ${1}_$2 $3
 }
 
 function run {
-    buildInternal "$1/$2" $2 $3
-    ./build/$2$executable_extension
+    build $1 $2 $3
+    run_internal $1 $2 ${1}_$2
 }
 
 function buildTest {
-    buildInternal "$1/$2" "$(echo $2)_test" $3
+    build $1 ${2}_test $3
 }
 
 function test {
-    buildInternal "$1/$2" "$(echo $2)_test" $3
-    ./build/$(echo $2)_test$executable_extension
+    buildTest $1 $2 $3
+    run_internal $1 $2 ${1}_${2}_test
+}
+
+function foreach_homework_and_task {
+    for homework_dir in */ ; do
+        if [[ ! $homework_dir =~ ^(homework_.+)/$ ]]; then
+            continue
+        fi
+
+        homework=${BASH_REMATCH[1]}
+
+        for task_dir in $homework_dir*/ ; do
+            if [[ ! $task_dir =~ ^${homework}/(task_.+)/$ ]]; then
+                continue
+            fi
+
+            task=${BASH_REMATCH[1]}
+
+            $1 $homework $task $2
+        done
+    done
+}
+
+# $1: configuration
+function buildAll {
+    foreach_homework_and_task build $1
+}
+
+# $1: configuration
+function testAll {
+    foreach_homework_and_task test $1
 }
 
 configuration='Debug'
 command='undefined_command'
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        build | run | buildTest | test) 
+        build | run | buildTest | test)
             command="$1"
             shift
 
@@ -96,10 +157,11 @@ while [[ "$#" -gt 0 ]]; do
                 exit 1
             fi
             ;;
+        buildAll | testAll) command="$1" ;;
         -r|--release) configuration='Release' ;;
         -d|--debug) configuration='Debug' ;;
-        -c|--clear) rm -rf ./build; ;;
-        clear) rm -rf ./build; exit 0 ;;
+        -c|--clear) rm -rf "$build_dir"; ;;
+        clear) rm -rf "$build_dir"; exit 0 ;;
         *) echo "unknown argument: $1"; exit 1 ;;
     esac
     shift
@@ -122,5 +184,12 @@ case $command in
         ;;
     test)
         test $homework $task $configuration
+        ;;
+
+    buildAll)
+        buildAll $configuration
+        ;;
+    testAll)
+        testAll $configuration
         ;;
 esac
