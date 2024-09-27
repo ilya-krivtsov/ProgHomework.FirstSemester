@@ -70,7 +70,10 @@ function build_internal {
 # $2: task
 # $3: target
 function run_internal {
+    return_to=$pwd
+    cd $1/$2
     build/$1/$2/$3$executable_extension
+    cd $return_to
 }
 
 # build, run, buildTest and test have these arguments:
