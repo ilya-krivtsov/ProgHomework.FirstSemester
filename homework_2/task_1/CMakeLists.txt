@@ -1,7 +1,4 @@
-project("${homeworkName}_task_1" LANGUAGES C)
-
-set(CMAKE_C_STANDARD 23)
-set(CMAKE_C_STANDARD_REQUIRED True)
+project("${homeworkName}_task_1")
 
 add_library(halfQSort halfQSort.c)
 
