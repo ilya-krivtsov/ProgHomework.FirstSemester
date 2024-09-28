@@ -19,8 +19,8 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install gcc-14
-      run: sudo apt install gcc-14
+    - name: Install gcc
+      run: sudo apt install gcc
 
     - name: Build
       env:
