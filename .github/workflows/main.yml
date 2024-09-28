@@ -11,16 +11,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-24.04]
 
     steps:
     - name: Clone repository
       uses: actions/checkout@v4
       with:
         submodules: recursive
-
-    - name: Install gcc
-      run: sudo apt install gcc
 
     - name: Build
       env:
