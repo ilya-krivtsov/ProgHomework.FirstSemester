@@ -1,0 +1,47 @@
+name: Build And Test
+
+on:
+  push:
+    branches: [ "main", "main-hw2-and-hw3" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        build_type: [Release]
+        c_compiler: [gcc]
+        include:
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install CMake
+      uses: ssrobins/install-cmake@v1
+      with:
+        version: 3.20.0
+
+    - name: Build
+      env:
+          HW_CMAKE: cmake
+          HW_CMAKE_COMPILER: gcc
+          HW_CMAKE_GENERATOR: "Unix Makefiles"
+          HW_EXE_EXTENSION: none
+      run: bash build.sh buildAll --clear --release
+
+    - name: Test
+      env:
+          HW_CMAKE: cmake
+          HW_CMAKE_COMPILER: gcc
+          HW_CMAKE_GENERATOR: "Unix Makefiles"
+          HW_EXE_EXTENSION: none
+      run: bash build.sh testAll --clear --release
