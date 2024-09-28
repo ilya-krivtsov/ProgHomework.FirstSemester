@@ -19,6 +19,9 @@ jobs:
       with:
         submodules: recursive
 
+    - name: Install gcc-14
+      run: sudo apt install gcc-14
+
     - name: Build
       env:
           HW_CMAKE: cmake
