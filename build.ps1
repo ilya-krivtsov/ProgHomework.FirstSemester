@@ -2,9 +2,12 @@ $root = $PSScriptRoot
 
 $buildDirectory = [System.IO.Path]::Combine($root, "build")
 
-Get-Content config.env | Foreach {
-    $name, $value = $_.Split('=')
-    Set-Content env:\$name $value
+if (Test-Path -Path config.env -PathType Leaf)
+{
+    Get-Content config.env | Foreach {
+        $name, $value = $_.Split('=')
+        Set-Content env:\$name $value
+    }
 }
 
 $cmake = $env:HW_CMAKE

@@ -2,7 +2,9 @@
 
 build_dir='build'
 
-source config.env
+if [[ -f config.env ]]; then
+    source config.env
+fi
 
 cmake=$HW_CMAKE
 compiler=$HW_CMAKE_COMPILER
