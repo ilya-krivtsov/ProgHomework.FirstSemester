@@ -21,16 +21,18 @@ jobs:
 
     - name: Build
       env:
-          HW_CMAKE: cmake
-          HW_CMAKE_COMPILER: gcc
-          HW_CMAKE_GENERATOR: "Unix Makefiles"
-          HW_EXE_EXTENSION: none
-      run: pwsh build.ps1 buildAll --clear --release
+        HW_CMAKE: cmake
+        HW_CMAKE_COMPILER: gcc
+        HW_CMAKE_GENERATOR: "Unix Makefiles"
+        HW_EXE_EXTENSION: none
+      shell: pwsh
+      run: build.ps1 buildAll --clear --release
 
     - name: Test
       env:
-          HW_CMAKE: cmake
-          HW_CMAKE_COMPILER: gcc
-          HW_CMAKE_GENERATOR: "Unix Makefiles"
-          HW_EXE_EXTENSION: none
-      run: pwsh build.ps1 testAll --clear --release
+        HW_CMAKE: cmake
+        HW_CMAKE_COMPILER: gcc
+        HW_CMAKE_GENERATOR: "Unix Makefiles"
+        HW_EXE_EXTENSION: none
+      shell: pwsh
+      run: build.ps1 testAll --clear --release
