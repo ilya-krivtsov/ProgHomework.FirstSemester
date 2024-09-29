@@ -25,7 +25,7 @@ jobs:
           HW_CMAKE_COMPILER: gcc
           HW_CMAKE_GENERATOR: "Unix Makefiles"
           HW_EXE_EXTENSION: none
-      run: bash build.sh buildAll --clear --release
+      run: pwsh build.ps1 buildAll --clear --release
 
     - name: Test
       env:
@@ -33,4 +33,4 @@ jobs:
           HW_CMAKE_COMPILER: gcc
           HW_CMAKE_GENERATOR: "Unix Makefiles"
           HW_EXE_EXTENSION: none
-      run: bash build.sh testAll --clear --release
+      run: pwsh build.ps1 testAll --clear --release
