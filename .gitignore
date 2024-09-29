@@ -3,4 +3,4 @@
 .vscode/launch.json
 .vscode/tasks.json
 build/
-config.txt
+config.env
