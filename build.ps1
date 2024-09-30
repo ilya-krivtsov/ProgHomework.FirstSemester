@@ -179,8 +179,8 @@ for ($i = 0; $i -lt $args.Count; $i++)
         { ($_ -eq '-d') -or ($_ -eq '--debug') } { $configuration = 'Debug' }
         { ($_ -eq '-qb') -or ($_ -eq '--quiet-build') } { $quietBuild = $true }
         { ($_ -eq '-qt') -or ($_ -eq '--quiet-test') } { $quietTest = $true }
-        { ($_ -eq '-c') -or ($_ -eq '--clear') } { Remove-Item -Recurse -Force -ErrorAction Ignore ./build }
-        'clear' { Remove-Item -Recurse -Force -ErrorAction Ignore ./build; exit 0 }
+        { ($_ -eq '-c') -or ($_ -eq '--clear') } { Remove-Item -Recurse -Force -ErrorAction Ignore $buildDirectory }
+        { $_ -eq 'clear' } { Remove-Item -Recurse -Force -ErrorAction Ignore $buildDirectory; exit 0 }
         default  { Write-Error "unknown argument: $arg"; exit 1 }
     }
 }
