@@ -71,7 +71,7 @@ function CMake-BuildInternal($target, $configuration, $quiet)
     if ($configuration -ne $lastConfiguration)
     {
         Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=$configuration", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
-            "-S", $root, "-B", $buildDirectory, "-G", "$generator") $root $quiet
+            "-S", $root, "-B", $buildDirectory, "-G", "'$generator'") $root $quiet
 
         $configuration | Out-File $configurationCacheFile
     }

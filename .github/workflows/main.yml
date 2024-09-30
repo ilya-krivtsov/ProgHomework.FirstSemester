@@ -23,7 +23,7 @@ jobs:
       env:
         HW_CMAKE: cmake
         HW_CMAKE_COMPILER: gcc
-        HW_CMAKE_GENERATOR: "Unix Makefiles"
+        HW_CMAKE_GENERATOR: Unix Makefiles
         HW_EXE_EXTENSION: none
       shell: pwsh
       run: ./build.ps1 buildAll --clear --release
@@ -32,7 +32,7 @@ jobs:
       env:
         HW_CMAKE: cmake
         HW_CMAKE_COMPILER: gcc
-        HW_CMAKE_GENERATOR: "Unix Makefiles"
+        HW_CMAKE_GENERATOR: Unix Makefiles
         HW_EXE_EXTENSION: none
       shell: pwsh
       run: ./build.ps1 testAll --clear --release
