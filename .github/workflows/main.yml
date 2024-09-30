@@ -26,7 +26,7 @@ jobs:
         HW_CMAKE_GENERATOR: "Unix Makefiles"
         HW_EXE_EXTENSION: none
       shell: pwsh
-      run: ./build.ps1 buildAll --clear --release
+      run: pwsh build.ps1 buildAll --clear --release
 
     - name: Test
       env:
@@ -35,4 +35,4 @@ jobs:
         HW_CMAKE_GENERATOR: "Unix Makefiles"
         HW_EXE_EXTENSION: none
       shell: pwsh
-      run: ./build.ps1 testAll --clear --release
+      run: pwsh build.ps1 testAll --clear --release
