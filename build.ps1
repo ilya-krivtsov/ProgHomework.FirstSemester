@@ -39,9 +39,9 @@ if (-not $executableExtension)
     $executableExtension = 'none'
 }
 
-if ($executable_extension -eq 'none')
+if ($executableExtension -eq 'none')
 {
-    $executable_extension = ''
+    $executableExtension = ''
 }
 
 function Run-Command($command, $commandArgs, $workingDirectory, $quiet)
