@@ -6,3 +6,4 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 
 add_subdirectory(homework_2)
 add_subdirectory(homework_3)
+add_subdirectory(homework_4)

@@ -48,10 +48,15 @@ function Run-Command($command, $commandArgs, $workingDirectory, $quiet)
 {
     $returnTo = $pwd
     cd $workingDirectory
-    Invoke-Expression "& `"$command`" $commandArgs $(if ($quiet) {'| Out-Null'} else {''})"
-    cd $returnTo
-    
-    if ($LastExitCode -ne 0) { exit 1 }
+    try
+    {
+        Invoke-Expression "& `"$command`" $commandArgs $(if ($quiet) {'| Out-Null'} else {''})"
+    }
+    finally
+    {
+        cd $returnTo
+        if ($LastExitCode -ne 0) { exit 1 }
+    }
 }
 
 function CMake-BuildInternal($target, $configuration, $quiet)
