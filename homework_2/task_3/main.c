@@ -4,10 +4,10 @@
 
 int readValue(const char *prompt, const char *incorrectValueMessage) {
     int value;
-    printf(prompt);
+    printf("%s", prompt);
     while ((scanf("%d", &value) != 1) || value < 0) {
         while (getchar() != '\n') {}
-        printf(incorrectValueMessage);
+        printf("%s", incorrectValueMessage);
     }
 }
 
