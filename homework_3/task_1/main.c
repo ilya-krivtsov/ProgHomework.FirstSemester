@@ -12,10 +12,10 @@ void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
 
 int readValue(const char *prompt, const char *incorrectValueMessage) {
     int value;
-    printf(prompt);
+    printf("%s", prompt);
     while ((scanf("%d", &value) != 1) || value < 0) {
         while (getchar() != '\n') {}
-        printf(incorrectValueMessage);
+        printf("%s", incorrectValueMessage);
     }
 }
 
@@ -23,6 +23,9 @@ int main(void) {
     int arrayLength = readValue("enter array length: ", "incorrect value: array length cannot be less than zero; try again: ");
 
     int *array = calloc(arrayLength, sizeof(int));
+    if (array == NULL) {
+        return 1;
+    }
 
     srand(time(NULL));
     randomizeArray(array, arrayLength, 0, 128);
