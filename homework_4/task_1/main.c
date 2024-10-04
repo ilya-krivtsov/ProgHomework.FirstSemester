@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <locale.h>
 
 #include "binaryAddition.h"
@@ -13,7 +14,7 @@ void printAnsi(const char *format) {
 #endif
 }
 
-void printBinary(stdint number, int bits, int bitToHighlight) {
+void printBinary(int8_t number, int bits, int bitToHighlight) {
     for (int i = bits - 1; i >= 0; --i) {
         int bit = (number >> i) & 1;
         if (i == bitToHighlight) {
@@ -26,8 +27,8 @@ void printBinary(stdint number, int bits, int bitToHighlight) {
     }
 }
 
-void printStep(stdint left, stdint right, stdint accumulatedResult, stdint accumulatedCarry,
-    stdint leftBit, stdint rightBit, stdint resultBit, stdint oldCarryBit, stdint newCarryBit, int steps) {
+void printStep(int8_t left, int8_t right, int8_t accumulatedResult, int8_t accumulatedCarry,
+    int8_t leftBit, int8_t rightBit, int8_t resultBit, int8_t oldCarryBit, int8_t newCarryBit, int steps) {
 
     if (steps != 0) {
 #if PRINT_ANSI
@@ -43,7 +44,7 @@ void printStep(stdint left, stdint right, stdint accumulatedResult, stdint accum
 #endif
     }
 
-    const int bitWidth = sizeof(stdint) * 8;
+    const int bitWidth = sizeof(int8_t) * 8;
 
     // 1 space here because carry can overflow
     printf(" ");
@@ -116,14 +117,14 @@ void printStep(stdint left, stdint right, stdint accumulatedResult, stdint accum
     while (getchar() != '\n') {}
 }
 
-stdint readValue(const char *prompt, void *printIncorrectValue(long long, long long), long long lowLimit, long long highLimit) {
+int8_t readValue(const char *prompt, void *printIncorrectValue(long long, long long), long long lowLimit, long long highLimit) {
     long long value;
     printf("%s", prompt);
     while ((scanf("%lld", &value) != 1) || value < lowLimit || value > highLimit) {
         while (getchar() != '\n') {}
         printIncorrectValue(lowLimit, highLimit);
     }
-    return (stdint)value;
+    return (int8_t)value;
 }
 
 void printError(long long lowLimit, long long highLimit) {
@@ -133,15 +134,15 @@ void printError(long long lowLimit, long long highLimit) {
 int main(void) {
     setlocale(LC_ALL, "ru_RU.UTF-8");
 
-    stdint left = readValue("введите первое число: ", printError, STDINT_MIN, STDINT_MAX);
-    stdint right = readValue("введите второе число: ", printError, STDINT_MIN, STDINT_MAX);
+    int8_t left = readValue("введите первое число: ", printError, INT8_MIN, INT8_MAX);
+    int8_t right = readValue("введите второе число: ", printError, INT8_MIN, INT8_MAX);
 
     // reset input
     while (getchar() != '\n') {}
 
     printf("для следующего шага нажмите Enter\n");
 
-    stdint result = addTwoNumbers(left, right, printStep);
+    int8_t result = addTwoNumbers(left, right, printStep);
 
     printf("результат: \n");
     printf("%d + %d = %d\n", left, right, result);
