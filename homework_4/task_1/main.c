@@ -116,22 +116,25 @@ void printStep(stdint left, stdint right, stdint accumulatedResult, stdint accum
     while (getchar() != '\n') {}
 }
 
-stdint readValue(const char *prompt, const char *incorrectValueMessage, long long lowLimit, long long highLimit) {
+stdint readValue(const char *prompt, void *printIncorrectValue(long long, long long), long long lowLimit, long long highLimit) {
     long long value;
-    printf(prompt);
+    printf("%s", prompt);
     while ((scanf("%lld", &value) != 1) || value < lowLimit || value > highLimit) {
         while (getchar() != '\n') {}
-        printf(incorrectValueMessage, lowLimit, highLimit);
+        printIncorrectValue(lowLimit, highLimit);
     }
     return (stdint)value;
+}
+
+void printError(long long lowLimit, long long highLimit) {
+    printf("введено неверное значение: число должно быть больше %llu и меньше %llu; попробуйте ещё раз: ", lowLimit, highLimit);
 }
 
 int main(void) {
     setlocale(LC_ALL, "ru_RU.UTF-8");
 
-    const char *errorMessage = "введено неверное значение: число должно быть больше %d и меньше %d; попробуйте ещё раз: ";
-    stdint left = readValue("введите первое число: ", errorMessage, STDINT_MIN, STDINT_MAX);
-    stdint right = readValue("введите второе число: ", errorMessage, STDINT_MIN, STDINT_MAX);
+    stdint left = readValue("введите первое число: ", printError, STDINT_MIN, STDINT_MAX);
+    stdint right = readValue("введите второе число: ", printError, STDINT_MIN, STDINT_MAX);
 
     // reset input
     while (getchar() != '\n') {}
