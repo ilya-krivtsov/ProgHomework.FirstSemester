@@ -11,10 +11,10 @@ int getRandom(int minValue, int maxValue) {
 
 int readValue(const char *prompt, const char *incorrectValueMessage) {
     int value;
-    printf(prompt);
+    printf("%s", prompt);
     while ((scanf("%d", &value) != 1) || value < 0) {
         while (getchar() != '\n') {}
-        printf(incorrectValueMessage);
+        printf("%s", incorrectValueMessage);
     }
 }
 
@@ -23,6 +23,9 @@ int main(void) {
     int numbersToCheckCount = readValue("enter amount of numbers to check: ", "incorrect value: amount cannot be less than zero; try again: ");
 
     int *array = calloc(arrayLength, sizeof(int));
+    if (array == NULL) {
+        return 1;
+    }
 
     int minRandom = 0,
         maxRandom = 128;
