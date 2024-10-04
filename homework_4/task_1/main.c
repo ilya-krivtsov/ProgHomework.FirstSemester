@@ -10,7 +10,7 @@
 
 void printAnsi(const char *format) {
 #if PRINT_ANSI
-    printf(format);
+    printf("%s", format);
 #endif
 }
 
