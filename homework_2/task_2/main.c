@@ -26,6 +26,10 @@ int main(void) {
     int *arrayA = calloc(arrayLength, sizeof(int)),
         *arrayB = calloc(arrayLength, sizeof(int));
 
+    if (arrayA == NULL || arrayB == NULL) {
+        return 1;
+    }
+
     srand(time(NULL));
     randomizeArray(arrayA, arrayLength, VALUE_MIN, VALUE_MAX);
     arrayB = memcpy(arrayB, arrayA, arrayLength * sizeof(int));
