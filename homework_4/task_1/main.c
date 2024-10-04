@@ -117,7 +117,7 @@ void printStep(int8_t left, int8_t right, int8_t accumulatedResult, int8_t accum
     while (getchar() != '\n') {}
 }
 
-int8_t readValue(const char *prompt, void *printIncorrectValue(long long, long long), long long lowLimit, long long highLimit) {
+int8_t readValue(const char *prompt, void (*printIncorrectValue)(long long, long long), long long lowLimit, long long highLimit) {
     long long value;
     printf("%s", prompt);
     while ((scanf("%lld", &value) != 1) || value < lowLimit || value > highLimit) {
@@ -128,7 +128,7 @@ int8_t readValue(const char *prompt, void *printIncorrectValue(long long, long l
 }
 
 void printError(long long lowLimit, long long highLimit) {
-    printf("введено неверное значение: число должно быть больше %llu и меньше %llu; попробуйте ещё раз: ", lowLimit, highLimit);
+    printf("введено неверное значение: число должно быть больше %lld и меньше %lld; попробуйте ещё раз: ", lowLimit, highLimit);
 }
 
 int main(void) {
