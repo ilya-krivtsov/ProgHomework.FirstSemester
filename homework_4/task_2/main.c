@@ -1,133 +1,201 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "database.h"
 #include "personEntry.h"
 
-void printDatabase(Database *database) {
-    printf("database:\n");
-    for (int i = 0; i < database->entriesCount; ++i) {
-        PersonEntry *entry = database->entries[i];
+typedef enum {
+    Exit,
+    Error,
+    Menu,
+    AddingEntry,
+    PrintingAllEntries,
+    FindNumberByName,
+    FindNameByPhone,
+    SaveDatabase
+} State;
 
-        if (entry == NULL) {
-            printf("- null;\n\n");
-            continue;
-        }
-
-        printf("- %s:\n", entry->personName);
-
-        for (int j = 0; j < entry->phoneNumbersCount; ++j) {
-            printf("  * %s\n", entry->phoneNumbers[j].number);
-        }
-        printf("\n");
+State readCommand(void) {
+    int command = -1;
+    if (scanf("%d", &command) != 1) {
+    }
+    while (getchar() != '\n') {}
+    switch (command)
+    {
+    case 0:
+        return Exit;
+    case 1:
+        return AddingEntry;
+    case 2:
+        return PrintingAllEntries;
+    case 3:
+        return FindNumberByName;
+    case 4:
+        return FindNameByPhone;
+    case 5:
+        return SaveDatabase;
+    default:
+        printf("Error: unknown command\n");
+        return Menu;
     }
 }
 
-bool doStuff(Database *database) {
-    PersonEntry *entry, *entry2, *entry3;
-    if (!tryCreateEntry(&entry, "Kris")) {
-        return false;
+char *readLine(const char *prompt) {
+    char buffer[1024] = { 0 };
+    printf("%s", prompt);
+
+    bool overflow = true;
+    for (int i = 0; i < sizeof(buffer) - 1; ++i) {
+        char c = getchar();
+        if (c == '\n' || c == EOF) {
+            overflow = false;
+            break;
+        }
+        buffer[i] = c;
     }
-    if (!tryAddRawPhoneNumber(entry, "+7 901 123 45 67")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry, "+7 912 345 67 89")) {
-        return false;
-    }
-    if (addEntry(database, entry) != DB_SUCCESS) {
-        return false;
+    if (overflow) {
+        while (getchar() != '\n') {}
     }
 
-    if (!tryCreateEntry(&entry2, "Susie")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry2, "+1 (301) 124-45-75")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry2, "+1 (212) 325-38-68")) {
-        return false;
-    }
-    if (addEntry(database, entry2) != DB_SUCCESS) {
-        return false;
+    return strdup(buffer);
+}
+
+State addEntryCommand(Database *database) {
+    if (database->entriesCount == DB_MAX_ENTRIES) {
+        printf("Error: entries slots maxed out\n");
+        return Menu;
     }
 
-    if (addEntry(database, NULL) != DB_SUCCESS) {
-        return false;
+    char *name = readLine("Enter name: ");
+    if (name == NULL) {
+        printf("Error: cannot read name");
+        return Menu;
     }
 
-    if (!tryCreateEntry(&entry3, "Noelle")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry3, "+3 (111) 222-33-44")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry3, "+3 (222) 999-22-11")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry3, "+3 (355) 532-23-45")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry3, "+3 (234) 342-64-41")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry3, "+3 (974) 756-33-64")) {
-        return false;
-    }
-    if (!tryAddRawPhoneNumber(entry3, "+3 (535) 463-22-53")) {
-        return false;
-    }
-    if (addEntry(database, entry3) != DB_SUCCESS) {
-        return false;
+    char *rawPhoneNumber = readLine("Enter phone number: ");
+    if (rawPhoneNumber == NULL) {
+        printf("Error: cannot read phone number");
+        return Menu;
     }
 
-    printDatabase(database);
+    PhoneNumber phoneNumber;
+    if (!tryParsePhoneNumber(rawPhoneNumber, &phoneNumber)) {
+        printf("Error: phone number is in incorrect format");
+        free(rawPhoneNumber);
+        return Menu;
+    }
+    free(rawPhoneNumber);
 
-    switch (saveDatabase("./db.txt", database))
-    {
-    case DB_IO_ERROR:
-        printf("write io error\n");
-        return false;
+    PersonEntry entry = {
+        .personName = name,
+        .phoneNumber = phoneNumber
+    };
 
-    case DB_SUCCESS:
-        printf("saved\n");
-        break;
+    if (!addEntry(database, entry)) {
+        printf("Error: cannot add new entry\n");
+        return Menu;
     }
 
-    Database *db2;
+    printf("Added entry successfully\n");
 
-    switch (loadDatabase("./db.txt", &db2))
-    {
-    case DB_IO_ERROR:
-        printf("read io error\n");
-        return false;
-
-    case DB_INVALID_FORMAT:
-        printf("invalid file format\n");
-        return false;
-
-    case DB_ALLOCATION_ERROR:
-        printf("alloc error\n");
-        break;
-
-    case DB_SUCCESS:
-        printf("loaded\n");
-        break;
+    int slotsLeft = DB_MAX_ENTRIES - database->entriesCount;
+    if (slotsLeft == 0) {
+        printf("Warning: no entry slots left in database for new entries\n");
+    } else if (slotsLeft <= 10) {
+        printf("Warning: %d entry slots left in database\n", slotsLeft);
     }
 
-    printf("loaded db:\n");
+    return Menu;
+}
 
-    printDatabase(db2);
+State printDatabaseCommand(Database *database) {
+    for (int i = 0; i < database->entriesCount; ++i) {
+        PersonEntry entry = database->entries[i];
+        printf("%s : %s\n", entry.personName, entry.phoneNumber);
+    }
 
-    disposeDatabase(db2);
+    return Menu;
+}
 
-    return true;
+State saveDatabaseCommand(Database *database, const char *path) {
+    FILE *file = fopen(path, "w");
+    if (file == NULL) {
+        printf("IO error: cannot save database\n");
+        return Menu;
+    }
+    if (!saveDatabase(file, database)) {
+        printf("Error: cannot save database\n");
+    }
+    fclose(file);
+    printf("Saved successfully\n");
+    return Menu;
+}
+
+bool doConversation(void) {
+    const char *databasePath = "./phoneDatabase";
+    Database *database;
+    FILE *file = fopen(databasePath, "r");
+    if (file == NULL) {
+        database = createDatabase();
+    } else {
+        database = loadDatabase(file);
+        fclose(file);
+    }
+
+    printf("Phone database\n");
+    printf("Available commands: \n");
+    printf("  0 - exit;\n");
+    printf("  1 - add new entry;\n");
+    printf("  2 - print all entries;\n");
+    printf("  3 - find phone number by name;\n");
+    printf("  4 - find name by phone number;\n");
+    printf("  5 - save database.\n");
+
+    State state = Menu;
+    while (true) {
+        switch (state)
+        {
+        case Exit:
+            printf("Exiting...\n");
+            disposeDatabase(database);
+            return true;
+
+        case Error:
+            disposeDatabase(database);
+            return false;
+
+        case Menu:
+            printf("phonedb> ");
+            state = readCommand();
+            break;
+
+        case AddingEntry:
+            state = addEntryCommand(database);
+            break;
+
+        case PrintingAllEntries:
+            state = printDatabaseCommand(database);
+            break;
+
+        case FindNumberByName:
+        case FindNameByPhone:
+            state = Menu;
+            break;
+
+        case SaveDatabase:
+            state = saveDatabaseCommand(database, databasePath);
+            break;
+
+        default:
+            printf("Error: Unknown state\n");
+            disposeDatabase(database);
+            return false;
+        }
+    }
 }
 
 int main(void) {
-    Database *database = NULL;
-
-    if (createDatabase(&database) != DB_SUCCESS || !doStuff(database)) {
-        printf("something is very wrong :((\n");
-    }
-
-    disposeDatabase(database);
+    bool conversationResult = doConversation();
+    return conversationResult ? 0 : 1;
 }

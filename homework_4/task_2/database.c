@@ -8,90 +8,55 @@
 #define DB_SIGNATURE "#!hw_phonebook"
 #define DB_BEGIN "{{"
 #define DB_END "}}"
-#define DB_ENTRY_BEGIN "[["
-#define DB_ENTRY_END "]]"
-#define DB_ENTRY_NULL "__NULL__"
 
-DBResult createDatabase(Database **database) {
+Database *createDatabase() {
+    Database *database = malloc(sizeof(Database));
     if (database == NULL) {
-        return DB_NULL_POINTER;
+        return NULL;
     }
+    database->entriesCount = 0;
 
-    Database *db = malloc(sizeof(Database));
-    if (db == NULL) {
-        *database = NULL;
-        return DB_ALLOCATION_ERROR;
-    }
-    db->entriesCount = 0;
-    db->entriesCapacity = 4;
-    db->entries = malloc(db->entriesCapacity * sizeof(PersonEntry *));
-
-    if (db->entries == NULL) {
-        *database = NULL;
-        return DB_ALLOCATION_ERROR;
-    }
-
-    *database = db;
-
-    return DB_SUCCESS;
+    return database;
 }
 
-DBResult addEntry(Database *database, PersonEntry *entry) {
+bool addEntry(Database *database, PersonEntry entry) {
     if (database == NULL) {
-        return DB_NULL_POINTER;
+        return false;
     }
 
-    if (database->entriesCount == database->entriesCapacity) {
-        database->entriesCapacity *= 2;
-        PersonEntry **entries = realloc(database->entries, database->entriesCapacity * sizeof(PersonEntry **));
-        if (entries == NULL) {
-            return DB_ALLOCATION_ERROR;
-        }
-        database->entries = entries;
+    // entries count cannot be more than DB_MAX_ENTRIES, but check this case too
+    if (database->entriesCount >= DB_MAX_ENTRIES) {
+        return false;
     }
+
     database->entries[database->entriesCount] = entry;
     ++database->entriesCount;
-    return DB_SUCCESS;
+    return true;
 }
 
 #pragma region Save/Load
 
-DBResult saveDatabase(const char *path, Database *database) {
+bool saveDatabase(FILE *stream, Database *database) {
+    if (stream == NULL) {
+        return false;
+    }
+
     if (database == NULL) {
-        return DB_NULL_POINTER;
+        return false;
     }
 
-    FILE *file = fopen(path, "w");
-    if (file == NULL) {
-        return DB_IO_ERROR;
-    }
-
-    fprintf(file, "%s\n", DB_SIGNATURE);
-    fprintf(file, "%s\n", DB_BEGIN);
+    fprintf(stream, "%s\n", DB_SIGNATURE);
+    fprintf(stream, "%s\n", DB_BEGIN);
 
     for (int i = 0; i < database->entriesCount; ++i) {
-        fprintf(file, "%s\n", DB_ENTRY_BEGIN);
-
-        PersonEntry *entry = database->entries[i];
-
-        if (entry == NULL) {
-            fprintf(file, "%s\n", DB_ENTRY_NULL);
-        } else {
-            fprintf(file, "%s\n", entry->personName);
-
-            for (int j = 0; j < entry->phoneNumbersCount; ++j) {
-                fprintf(file, "%s\n", entry->phoneNumbers[j].number);
-            }
-        }
-
-        fprintf(file, "%s\n", DB_ENTRY_END);
+        PersonEntry entry = database->entries[i];
+        fprintf(stream, "%s\n", entry.personName);
+        fprintf(stream, "%s\n", entry.phoneNumber);
     }
 
-    fprintf(file, "%s\n", DB_END);
+    fprintf(stream, "%s\n", DB_END);
 
-    fclose(file);
-
-    return DB_SUCCESS;
+    return true;
 }
 
 // reads line and sets first '\n' to '\0'
@@ -110,107 +75,64 @@ bool tryReadLine(char *buffer, int count, FILE *file) {
     return true;
 }
 
-DBResult loadFromFile(Database *database, FILE *file) {
+Database *loadDatabase(FILE *stream) {
+    if (stream == NULL) {
+        return NULL;
+    }
+
+    Database *database = createDatabase();
+
+    if (database == NULL) {
+        return NULL;
+    }
+
     char buffer[256] = { 0 };
 
-    if (!tryReadLine(buffer, sizeof(buffer), file) && strcmp(buffer, DB_SIGNATURE) != 0) {
-        return DB_INVALID_FORMAT;
+    if (!tryReadLine(buffer, sizeof(buffer), stream) && strcmp(buffer, DB_SIGNATURE) != 0) {
+        return NULL;
     }
 
-    if (!tryReadLine(buffer, sizeof(buffer), file) && strcmp(buffer, DB_BEGIN) != 0) {
-        return DB_INVALID_FORMAT;
+    if (!tryReadLine(buffer, sizeof(buffer), stream) && strcmp(buffer, DB_BEGIN) != 0) {
+        return NULL;
     }
-
-    bool finishedScanning = false;
-
-    DBResult result;
 
     while (true) {
-        // entry begin anchor or db end anchor
-        if (!tryReadLine(buffer, sizeof(buffer), file)) {
-            return DB_INVALID_FORMAT;
+        // person name or db end anchor
+        if (!tryReadLine(buffer, sizeof(buffer), stream)) {
+            return NULL;
         }
 
         if (strcmp(buffer, DB_END) == 0) {
-            finishedScanning = true;
             break;
         }
 
-        if (strcmp(buffer, DB_ENTRY_BEGIN) != 0) {
-            return DB_INVALID_FORMAT;
+        char *personName = strdup(buffer);
+        if (personName == NULL) {
+            return NULL;
         }
 
-        // name or null keyword
-        if (!tryReadLine(buffer, sizeof(buffer), file)) {
-            return DB_INVALID_FORMAT;
+        // phone number
+        if (!tryReadLine(buffer, sizeof(buffer), stream)) {
+            return NULL;
         }
 
-        if (strcmp(buffer, DB_ENTRY_NULL) == 0) {
-            result = addEntry(database, NULL);
-            if (result != DB_SUCCESS) {
-                return result;
-            }
-            if (!tryReadLine(buffer, sizeof(buffer), file) || strcmp(buffer, DB_ENTRY_END) != 0) {
-                return DB_INVALID_FORMAT;
-            }
-            continue;
+        PhoneNumber phoneNumber;
+        if (!tryParsePhoneNumber(buffer, &phoneNumber)) {
+            return NULL;
         }
 
-        PersonEntry *entry;
-        if (!tryCreateEntry(&entry, buffer)) {
-            return DB_ALLOCATION_ERROR;
-        }
+        PersonEntry entry = {
+            .personName = personName,
+            .phoneNumber = phoneNumber
+        };
 
-        while (true) {
-            // phone number or entry end anchor
-            if (!tryReadLine(buffer, sizeof(buffer), file)) {
-                return DB_INVALID_FORMAT;
-            }
-
-            if (strcmp(buffer, DB_ENTRY_END) == 0) {
-                break;
-            }
-
-            PhoneNumber number;
-            if (!tryParsePhoneNumber(buffer, &number)) {
-                return DB_INVALID_FORMAT;
-            }
-            tryAddPhoneNumber(entry, number);
-        }
-
-        result = addEntry(database, entry);
-        if (result != DB_SUCCESS) {
-            return result;
+        if (!addEntry(database, entry)) {
+            // no space left, not an error
+            break;
         }
     }
 
-    return finishedScanning ? DB_SUCCESS : DB_INVALID_FORMAT;
-}
-
-DBResult loadDatabase(const char *path, Database **database) {
-    if (database == NULL) {
-        return DB_NULL_POINTER;
-    }
-
-    FILE *file = fopen(path, "r");
-
-    if (file == NULL) {
-        *database = NULL;
-        return DB_IO_ERROR;
-    }
-
-    Database *db;
-
-    DBResult result = createDatabase(&db);
-    if (result == DB_SUCCESS) {
-        result = loadFromFile(db, file);
-    }
-
-    *database = result == DB_SUCCESS ? db : NULL;
-
-    fclose(file);
-
-    return result;
+    return database;
 }
 
 #pragma endregion
@@ -221,8 +143,7 @@ void disposeDatabase(Database *database) {
     }
 
     for (int i = 0; i < database->entriesCount; ++i) {
-        disposeEntry(database->entries[i]);
+        disposeEntry(&database->entries[i]);
     }
-    free(database->entries);
     free(database);
 }

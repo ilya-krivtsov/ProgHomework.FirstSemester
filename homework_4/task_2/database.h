@@ -1,57 +1,37 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "personEntry.h"
 
+#define DB_MAX_ENTRIES 100
+
 typedef struct {
-    int entriesCount, entriesCapacity;
-    PersonEntry **entries;
+    int entriesCount;
+    PersonEntry entries[DB_MAX_ENTRIES];
 } Database;
 
-/// @brief Each operation with database (except dispose) yields result
-typedef enum {
-    /// @brief Operation is successful
-    DB_SUCCESS = 0,
-
-    /// @brief IO error (file does not exist / open in other process / etc)
-    DB_IO_ERROR = 1,
-
-    /// @brief Specified pointer is null
-    DB_NULL_POINTER = 2,
-
-    /// @brief Allocation error
-    DB_ALLOCATION_ERROR = 3,
-
-    /// @brief Invalid file format (when reading)
-    DB_INVALID_FORMAT = 4,
-
-    /// @brief Unknown error
-    DB_UNKNOWN_ERROR = -1
-} DBResult;
-
 /// @brief Creates empty database
-/// @param database Pointer to write result to
-/// @return `DB_SUCCESS`, `DB_NULL_POINTER`, `DB_ALLOCATION_ERROR`
-DBResult createDatabase(Database **database);
+/// @return `Database` if created successfully, `NULL` otherwise
+Database *createDatabase();
 
 /// @brief Adds a person entry to database
 /// @param database Pointer to database
-/// @param entry Entry to add (can be `NULL`)
-/// @return `DB_SUCCESS`, `DB_NULL_POINTER`, `DB_ALLOCATION_ERROR`
-DBResult addEntry(Database *database, PersonEntry *entry);
+/// @param entry Entry to add
+/// @return `true` if added successfully, `false` otherwise (no space in database left)
+bool addEntry(Database *database, PersonEntry entry);
 
-/// @brief Saves database to specified file path (will OVERWRITE existing file contents)
-/// @param input Path to save database to
+/// @brief Saves database to specified stream
+/// @param stream Stream to save database to
 /// @param database Pointer to database
-/// @return `DB_SUCCESS`, `DB_IO_ERROR`, `DB_NULL_POINTER`
-DBResult saveDatabase(const char *path, Database *database);
+/// @return `true` if saved successfully, `false` otherwise
+bool saveDatabase(FILE *stream, Database *database);
 
-/// @brief Loads database from specified file path
-/// @param input Path to load database from
-/// @param database Pointer to write result to
-/// @return `DB_SUCCESS`, `DB_IO_ERROR`, `DB_NULL_POINTER`, `DB_ALLOCATION_ERROR`, `DB_INVALID_FORMAT`
-DBResult loadDatabase(const char *path, Database **database);
+/// @brief Loads database from specified file stream
+/// @param stream Stream to load database from
+/// @return `Database` if loaded successfully, `NULL` otherwise
+Database *loadDatabase(FILE *stream);
 
 /// @brief Disposes database and all of its entries
 /// @param database Database to dispose (can be `NULL`)
