@@ -16,6 +16,39 @@ typedef enum {
     SaveDatabase
 } State;
 
+char *readLine(const char *prompt) {
+    char buffer[1024] = { 0 };
+    printf("%s", prompt);
+
+    bool overflow = true;
+    for (int i = 0; i < sizeof(buffer) - 1; ++i) {
+        char c = getchar();
+        if (c == '\n' || c == EOF) {
+            overflow = false;
+            break;
+        }
+        buffer[i] = c;
+    }
+    if (overflow) {
+        while (getchar() != '\n') {}
+    }
+
+    return strdup(buffer);
+}
+
+void printEntry(PersonEntry entry) {
+    printf("%s : %s\n", entry.personName, entry.phoneNumber);
+}
+
+bool tryReadPhoneNumber(const char *prompt, PhoneNumber *phoneNumber) {
+    char *rawPhoneNumber = readLine(prompt);
+    if (!tryParsePhoneNumber(rawPhoneNumber, phoneNumber)) {
+        free(rawPhoneNumber);
+        return false;
+    }
+    return true;
+}
+
 State readCommand(void) {
     int command = -1;
     if (scanf("%d", &command) != 1) {
@@ -39,26 +72,6 @@ State readCommand(void) {
         printf("Error: unknown command\n");
         return Menu;
     }
-}
-
-char *readLine(const char *prompt) {
-    char buffer[1024] = { 0 };
-    printf("%s", prompt);
-
-    bool overflow = true;
-    for (int i = 0; i < sizeof(buffer) - 1; ++i) {
-        char c = getchar();
-        if (c == '\n' || c == EOF) {
-            overflow = false;
-            break;
-        }
-        buffer[i] = c;
-    }
-    if (overflow) {
-        while (getchar() != '\n') {}
-    }
-
-    return strdup(buffer);
 }
 
 State addEntryCommand(Database *database) {
@@ -110,11 +123,57 @@ State addEntryCommand(Database *database) {
 }
 
 State printDatabaseCommand(Database *database) {
+    if (database->entriesCount == 0) {
+        printf("Empty database\n");
+    }
     for (int i = 0; i < database->entriesCount; ++i) {
         PersonEntry entry = database->entries[i];
-        printf("%s : %s\n", entry.personName, entry.phoneNumber);
+        printEntry(entry);
     }
 
+    return Menu;
+}
+
+State findNameByPhoneCommand(Database *database) {
+    PhoneNumber phoneNumber;
+    if (!tryReadPhoneNumber("Input phone number: ", &phoneNumber)) {
+        printf("Incorrect phone number format");
+        return Menu;
+    }
+
+    bool foundAny = false;
+    printf("Found entries:\n");
+    for (int i = 0; i < database->entriesCount; ++i) {
+        PersonEntry entry = database->entries[i];
+        if (strstr(entry.phoneNumber, phoneNumber)) {
+            foundAny = true;
+            printEntry(entry);
+        }
+    }
+
+    if (!foundAny) {
+        printf("None\n");
+    }
+    return Menu;
+}
+
+State findNumberByNameCommand(Database *database) {
+    char *personName = readLine("Input name: ");
+
+    bool foundAny = false;
+    printf("Found entries:\n");
+    for (int i = 0; i < database->entriesCount; ++i) {
+        PersonEntry entry = database->entries[i];
+        if (strstr(entry.personName, personName)) {
+            foundAny = true;
+            printEntry(entry);
+        }
+    }
+
+    if (!foundAny) {
+        printf("None\n");
+    }
+    free(personName);
     return Menu;
 }
 
@@ -126,9 +185,10 @@ State saveDatabaseCommand(Database *database, const char *path) {
     }
     if (!saveDatabase(file, database)) {
         printf("Error: cannot save database\n");
+    } else {
+        printf("Saved successfully\n");
     }
     fclose(file);
-    printf("Saved successfully\n");
     return Menu;
 }
 
@@ -141,6 +201,22 @@ bool doConversation(void) {
     } else {
         database = loadDatabase(file);
         fclose(file);
+
+        if (database == NULL) {
+            printf("Error: cannot load database; create new? (y/n): ");
+            char choice;
+            scanf("%c", &choice);
+            if (choice == 'y') {
+                database = createDatabase();
+            } else {
+                return false;
+            }
+        }
+    }
+
+    if (database == NULL) {
+        printf("Error: cannot create database\n");
+        return false;
     }
 
     printf("Phone database\n");
@@ -179,8 +255,11 @@ bool doConversation(void) {
             break;
 
         case FindNumberByName:
+            state = findNumberByNameCommand(database);
+            break;
+
         case FindNameByPhone:
-            state = Menu;
+            state = findNameByPhoneCommand(database);
             break;
 
         case SaveDatabase:
