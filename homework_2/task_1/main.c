@@ -11,7 +11,7 @@ void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
     }
 }
 
-void printArray(int *array, int length) {
+void printArray(const int *array, int length) {
     for (int i = 0; i < length; ++i) {
         printf("%d", array[i]);
         if (i != length - 1)
@@ -21,12 +21,13 @@ void printArray(int *array, int length) {
 }
 
 int readValue(const char *prompt, const char *incorrectValueMessage) {
-    int value;
+    int value = -1;
     printf("%s", prompt);
     while ((scanf("%d", &value) != 1) || value < 0) {
         while (getchar() != '\n') {}
         printf("%s", incorrectValueMessage);
     }
+    return value;
 }
 
 int main(void) {

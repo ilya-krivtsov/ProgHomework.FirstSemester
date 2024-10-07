@@ -21,7 +21,7 @@ void assertHalfSorted(int *array, int arrayLength, int firstElement) {
     bool reachedHalf = false;
     for (int i = 0; i < arrayLength; ++i) {
         int element = array[i];
-        if (element == firstElement) {
+        if (element >= firstElement) {
             reachedHalf = true;
         }
         if (reachedHalf) {
@@ -76,7 +76,7 @@ CTEST(halfQSortTests, constantArrayTest_FirstElementWillBeInMiddle_B) {
 
 CTEST(halfQSortTests, dynamicArrayTest_A) {
 #define size 8
-    int array[size];
+    int array[size] = { 0 };
     randomizeArray(array, size, -2048, 2048);
     testArray(array, size);
 #undef size
@@ -84,7 +84,7 @@ CTEST(halfQSortTests, dynamicArrayTest_A) {
 
 CTEST(halfQSortTests, dynamicArrayTest_B) {
 #define size 16
-    int array[size];
+    int array[size] = { 0 };
 
     const int iterations = 8;
     for (int i = 0; i < iterations; ++i) {
@@ -96,9 +96,21 @@ CTEST(halfQSortTests, dynamicArrayTest_B) {
 
 CTEST(halfQSortTests, dynamicArrayTest_C) {
 #define size 64
-    int array[size];
+    int array[size] = { 0 };
 
     const int iterations = 16;
+    for (int i = 0; i < iterations; ++i) {
+        randomizeArray(array, size, -2048, 2048);
+        testArray(array, size);
+    }
+#undef size
+}
+
+CTEST(halfQSortTests, dynamicArrayTest_D) {
+#define size 65536
+    int array[size] = { 0 };
+
+    const int iterations = 128;
     for (int i = 0; i < iterations; ++i) {
         randomizeArray(array, size, -2048, 2048);
         testArray(array, size);
