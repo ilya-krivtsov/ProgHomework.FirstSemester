@@ -37,20 +37,22 @@ double measureMeanTime(void (*sortingAlgoritm)(int *, int), int *array, int arra
 int main(void) {
     const int arrayLength = 100000;
 
-    int *arrayA = calloc(arrayLength, sizeof(int)),
-        *arrayB = calloc(arrayLength, sizeof(int));
+    int *countingSortArray = calloc(arrayLength, sizeof(int)),
+        *bubbleSortArray = calloc(arrayLength, sizeof(int));
 
-    if (arrayA == NULL || arrayB == NULL) {
+    if (countingSortArray == NULL || bubbleSortArray == NULL) {
+        free(countingSortArray);
+        free(bubbleSortArray);
         return 1;
     }
 
     srand(time(NULL));
-    randomizeArray(arrayA, arrayLength, VALUE_MIN, VALUE_MAX);
-    arrayB = memcpy(arrayB, arrayA, arrayLength * sizeof(int));
+    randomizeArray(countingSortArray, arrayLength, VALUE_MIN, VALUE_MAX);
+    bubbleSortArray = memcpy(bubbleSortArray, countingSortArray, arrayLength * sizeof(int));
 
-    printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(countingSort, arrayA, arrayLength) / 1000.0);
-    printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(bubbleSort, arrayA, arrayLength) / 1000.0);
+    printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(countingSort, countingSortArray, arrayLength) / 1000.0);
+    printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(bubbleSort, countingSortArray, arrayLength) / 1000.0);
 
-    free(arrayA);
-    free(arrayB);
+    free(countingSortArray);
+    free(bubbleSortArray);
 }
