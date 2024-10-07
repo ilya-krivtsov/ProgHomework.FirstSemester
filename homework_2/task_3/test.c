@@ -58,7 +58,7 @@ void testAllCases(power power) {
 }
 
 CTEST(powerTests, powerNaiiveTest) {
-    testAllCases(powerNaiive);
+    testAllCases(powerNaive);
 }
 
 CTEST(powerTests, powerRecursiveTest) {
