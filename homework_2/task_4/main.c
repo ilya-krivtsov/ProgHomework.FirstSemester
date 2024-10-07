@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "fib.h"
+#include "fibonacci.h"
 
 // returns time in nanoseconds
 uint64_t measureTime(uint64_t(*fib)(uint64_t), int n) {

@@ -2,7 +2,7 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
-#include "fib.h"
+#include "fibonacci.h"
 
 int main(int argc, const char *argv[]) {
     return ctest_main(argc, argv);

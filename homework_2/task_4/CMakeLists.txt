@@ -1,6 +1,6 @@
 project("${homeworkName}_task_4")
 
-add_library(fibonacci fib.c)
+add_library(fibonacci fibonacci.c)
 
 add_executable(${PROJECT_NAME} main.c)
 target_link_libraries(${PROJECT_NAME} PRIVATE fibonacci)
