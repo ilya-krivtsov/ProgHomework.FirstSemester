@@ -41,10 +41,12 @@ void testEightElementsArray(sort sort) {
 
 void test20ElementsSameValuesArray(sort sort) {
 #define size 20
-    int array[size], expected[size];
+    int array[size];
+    int expected[size];
 
     for (int i = 0; i < size; ++i) {
-        array[i] = expected[i] = 1532;
+        array[i] = 1532;
+        expected[i] = array[i];
     }
 
     sort(array, size);
