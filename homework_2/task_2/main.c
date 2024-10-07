@@ -12,12 +12,26 @@ void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
 }
 
 // returns time in nanoseconds
-long long measureTime(void (*sortingAlgoritm)(int *, int), int *array, int arrayLength) {
-    struct timespec startTime, endTime;
-    clock_gettime(CLOCK_MONOTONIC, &startTime);
-    sortingAlgoritm(array, arrayLength);
-    clock_gettime(CLOCK_MONOTONIC, &endTime);
-    return (endTime.tv_nsec - startTime.tv_nsec) + (endTime.tv_sec - startTime.tv_sec) * 1000 * 1000 * 1000;
+double measureMeanTime(void (*sortingAlgoritm)(int *, int), int *array, int arrayLength) {
+    long long totalTime = 0;
+    const int iterations = 256;
+
+    for (int i = 0; i < iterations; ++i) {
+        struct timespec startTime;
+        clock_gettime(CLOCK_MONOTONIC, &startTime);
+
+        sortingAlgoritm(array, arrayLength);
+
+        struct timespec endTime;
+        clock_gettime(CLOCK_MONOTONIC, &endTime);
+
+        long long elapsedNanoseconds = (endTime.tv_nsec - startTime.tv_nsec);
+        long long elapsedSeconds = (endTime.tv_sec - startTime.tv_sec);
+
+        totalTime += elapsedNanoseconds + (elapsedSeconds * 1'000'000'000);
+    }
+
+    return (double)totalTime / iterations;
 }
 
 int main(void) {
@@ -34,8 +48,8 @@ int main(void) {
     randomizeArray(arrayA, arrayLength, VALUE_MIN, VALUE_MAX);
     arrayB = memcpy(arrayB, arrayA, arrayLength * sizeof(int));
 
-    printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureTime(countingSort, arrayA, arrayLength) / 1000.0);
-    printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureTime(bubbleSort, arrayA, arrayLength) / 1000.0);
+    printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(countingSort, arrayA, arrayLength) / 1000.0);
+    printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(bubbleSort, arrayA, arrayLength) / 1000.0);
 
     free(arrayA);
     free(arrayB);
