@@ -3,32 +3,30 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-void swap(int *left, int *right) {
-    int temp = *left;
-    *left = *right;
-    *right = temp;
-}
-
 void halfQSort(int *array, int arrayLength) {
     if (arrayLength == 0) {
         return;
     }
 
-    int firstElement = array[0],
-        pointerA = 0,
-        pointerB = 0,
-        pointerC = arrayLength - 1;
+    int firstElement = array[0];
 
-    while (pointerB <= pointerC) {
-        if (array[pointerB] < firstElement) {
-            swap(&array[pointerA], &array[pointerB]);
-            ++pointerA;
-            ++pointerB;
-        } else if (array[pointerB] > firstElement) {
-            swap(&array[pointerB], &array[pointerC]);
-            --pointerC;
-        } else {
-            ++pointerB;
+    int left = -1;
+    int right = arrayLength;
+
+    while (true) {
+        do {
+            ++left;
+        } while (array[left] < firstElement);
+        do {
+            --right;
+        } while (array[right] >= firstElement);
+
+        if (left >= right) {
+            break;
         }
+
+        int temp = array[left];
+        array[left] = array[right];
+        array[right] = temp;
     }
 }
