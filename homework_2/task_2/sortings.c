@@ -3,19 +3,44 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-void countingSort(int *array, int arrayLength) {
-    int *countingArray = calloc(VALUES_COUNT, sizeof(int));
+bool countingSort(int *array, int arrayLength) {
+    if (arrayLength == 0) {
+        return true;
+    }
+
+    int maxElement = array[0];
+    int minElement = array[0];
 
     for (int i = 0; i < arrayLength; ++i) {
-        ++countingArray[array[i] - VALUE_MIN];
+        if (array[i] > maxElement) {
+            maxElement = array[i];
+        }
+
+        if (array[i] < minElement) {
+            minElement = array[i];
+        }
+    }
+
+    int valuesCount = maxElement - minElement + 1;
+    if (valuesCount < 0) {
+        return false;
+    }
+
+    int *countingArray = calloc(valuesCount, sizeof(int));
+    if (countingArray == NULL) {
+        return false;
+    }
+
+    for (int i = 0; i < arrayLength; ++i) {
+        ++countingArray[array[i] - minElement];
     }
 
     int arrayPointer = 0;
 
-    for (int i = 0; i < VALUES_COUNT; ++i) {
+    for (int i = 0; i < valuesCount; ++i) {
         int count = countingArray[i];
         for (int k = 0; k < count; ++k) {
-            array[arrayPointer] = i + VALUE_MIN;
+            array[arrayPointer] = i + minElement;
             ++arrayPointer;
         }
     }
@@ -23,7 +48,7 @@ void countingSort(int *array, int arrayLength) {
     free(countingArray);
 }
 
-void bubbleSort(int *array, int arrayLength) {
+bool bubbleSort(int *array, int arrayLength) {
     for (int i = 0; i < arrayLength; ++i) {
         bool swappedAny = false;
         for (int j = arrayLength - 1; j > i; --j) {
@@ -40,4 +65,6 @@ void bubbleSort(int *array, int arrayLength) {
             break;
         }
     }
+
+    return true;
 }

@@ -11,8 +11,9 @@ void randomizeArray(int *array, int arrayLength, int minValue, int maxValue) {
     }
 }
 
-// returns time in nanoseconds
-double measureMeanTime(void (*sortingAlgoritm)(int *, int), int *array, int arrayLength) {
+// returns false if allocation failed
+// result: time in nanoseconds
+bool measureMeanTime(bool (*sortingAlgoritm)(int *, int), int *array, int arrayLength, double *result) {
     long long totalTime = 0;
     const int iterations = 256;
 
@@ -20,7 +21,9 @@ double measureMeanTime(void (*sortingAlgoritm)(int *, int), int *array, int arra
         struct timespec startTime;
         clock_gettime(CLOCK_MONOTONIC, &startTime);
 
-        sortingAlgoritm(array, arrayLength);
+        if (!sortingAlgoritm(array, arrayLength)) {
+            return false;
+        }
 
         struct timespec endTime;
         clock_gettime(CLOCK_MONOTONIC, &endTime);
@@ -31,7 +34,8 @@ double measureMeanTime(void (*sortingAlgoritm)(int *, int), int *array, int arra
         totalTime += elapsedNanoseconds + (elapsedSeconds * 1'000'000'000);
     }
 
-    return (double)totalTime / iterations;
+    *result = (double)totalTime / iterations;
+    return true;
 }
 
 int main(void) {
@@ -47,11 +51,22 @@ int main(void) {
     }
 
     srand(time(NULL));
-    randomizeArray(countingSortArray, arrayLength, VALUE_MIN, VALUE_MAX);
+    randomizeArray(countingSortArray, arrayLength, -4096, 4095);
     bubbleSortArray = memcpy(bubbleSortArray, countingSortArray, arrayLength * sizeof(int));
 
-    printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(countingSort, countingSortArray, arrayLength) / 1000.0);
-    printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, measureMeanTime(bubbleSort, countingSortArray, arrayLength) / 1000.0);
+    double countingSortTime = 0;
+    double bubbleSortTime = 0;
+
+    if (measureMeanTime(countingSort, countingSortArray, arrayLength, &countingSortTime) &&
+        measureMeanTime(bubbleSort, countingSortArray, arrayLength, &bubbleSortTime)) {
+        printf("counting sort sorted array of %d elements in %.2f us\n", arrayLength, countingSortTime / 1000.0);
+        printf("bubble sort   sorted array of %d elements in %.2f us\n", arrayLength, bubbleSortTime / 1000.0);
+    } else {
+        printf("allocation error occured while sorting\n");
+        free(countingSortArray);
+        free(bubbleSortArray);
+        return 1;
+    }
 
     free(countingSortArray);
     free(bubbleSortArray);
