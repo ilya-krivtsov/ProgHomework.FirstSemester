@@ -1,11 +1,12 @@
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 
 /// Callback that is called after performing every step of addition.
 /// Arguments in order: left, right, accumulatedResult, accumulatedCarryBits,
 /// leftBit, rightBit, resultBit, oldCarryBit, newCarryBit, steps (0 before first step, incrementing after every step)
-typedef void (*AdditionCallback)(int8_t, int8_t, int8_t, int8_t, int8_t, int8_t, int8_t, int8_t, int8_t, int);
+typedef void (*AdditionCallback)(int8_t, int8_t, int8_t, int8_t, bool, bool, bool, bool, bool, int);
 
 /// @brief Adds two numbers with pre-step callback
 /// @param left Left operand

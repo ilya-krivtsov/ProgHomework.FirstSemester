@@ -28,7 +28,7 @@ void printBinary(int8_t number, int bits, int bitToHighlight) {
 }
 
 void printStep(int8_t left, int8_t right, int8_t accumulatedResult, int8_t accumulatedCarry,
-    int8_t leftBit, int8_t rightBit, int8_t resultBit, int8_t oldCarryBit, int8_t newCarryBit, int steps) {
+    bool leftBit, bool rightBit, bool resultBit, bool oldCarryBit, bool newCarryBit, int steps) {
 
     if (steps != 0) {
 #if PRINT_ANSI
