@@ -46,6 +46,8 @@ bool countingSort(int *array, int arrayLength) {
     }
 
     free(countingArray);
+
+    return true;
 }
 
 bool bubbleSort(int *array, int arrayLength) {
