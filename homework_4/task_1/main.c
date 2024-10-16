@@ -8,19 +8,25 @@
 // set to false to disable color and line overrides
 #define PRINT_ANSI true
 
-void printAnsi(const char *format) {
 #if PRINT_ANSI
-    printf("%s", format);
+
+#define ANSI_BG_YELLOW "\e[43m"
+#define ANSI_FG_GREEN "\e[32m"
+#define ANSI_RESET "\e[0m"
+
+#else
+
+#define ANSI_BG_YELLOW ""
+#define ANSI_FG_GREEN ""
+#define ANSI_RESET ""
+
 #endif
-}
 
 void printBinary(int8_t number, int bits, int bitToHighlight) {
     for (int i = bits - 1; i >= 0; --i) {
         int bit = (number >> i) & 1;
         if (i == bitToHighlight) {
-            printAnsi("\e[1;32m");
-            printf("%d", bit);
-            printAnsi("\e[0m");
+            printf(ANSI_FG_GREEN "%d" ANSI_RESET, bit);
         } else {
             printf("%d", bit);
         }
@@ -52,9 +58,7 @@ void printStep(int8_t left, int8_t right, int8_t accumulatedResult, int8_t accum
     for (int i = bitWidth - 1; i >= 0; --i) {
         if ((accumulatedCarry >> i) & 1 == 1) {
             if (i + 1 == steps) {
-                printAnsi("\e[43m");
-                printf(".");
-                printAnsi("\e[0m");
+                printf(ANSI_BG_YELLOW "." ANSI_RESET);
             } else {
                 printf(".");
             }
