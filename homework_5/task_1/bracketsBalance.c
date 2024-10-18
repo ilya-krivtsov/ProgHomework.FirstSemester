@@ -1,5 +1,7 @@
 #include "bracketsBalance.h"
 
+#include <stdlib.h>
+
 #include "../stack/stack.h"
 
 BalanceResult checkIfBracketsBalanced(const char *string) {
