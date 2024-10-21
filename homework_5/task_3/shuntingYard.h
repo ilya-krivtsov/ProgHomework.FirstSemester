@@ -10,8 +10,6 @@ typedef enum {
     YARD_ALLOCATION_ERROR
 } YardConsumeResult;
 
-typedef void (*OutputFunction)(char output);
-
 bool shuntingYardCreate(ShuntingYard **yard);
 
 YardConsumeResult shuntingYardConsumeInput(ShuntingYard *yard, char input, char *outputBuffer, int bufferLength, int *bufferPosition);
