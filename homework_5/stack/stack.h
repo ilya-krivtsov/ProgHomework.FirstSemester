@@ -17,14 +17,14 @@ bool stackCreate(Stack **stack);
 bool stackPush(Stack *stack, uint64_t value);
 
 /// @brief Pops value from the top of the stack
-/// @param stack Pointer to `Stack` instance 
-/// @param value Pointer to write value to 
+/// @param stack Pointer to `Stack` instance
+/// @param value Pointer to write value to
 /// @return `true` if stack was non-empty, `false` otherwise
 bool stackTryPop(Stack *stack, uint64_t *value);
 
 /// @brief Returns value from the top of the stack without removing it
 /// @param stack Pointer to `Stack` instance
-/// @param value Pointer to write value to 
+/// @param value Pointer to write value to
 /// @return `true` if stack was non-empty, `false` otherwise
 bool stackTryPeek(Stack *stack, uint64_t *value);
 
@@ -34,5 +34,5 @@ bool stackTryPeek(Stack *stack, uint64_t *value);
 bool stackIsEmpty(Stack *stack);
 
 /// @brief Disposes stack and all of its elements
-/// @param stack `Stack` to dispose 
+/// @param stack `Stack` to dispose
 void stackDispose(Stack *stack);
