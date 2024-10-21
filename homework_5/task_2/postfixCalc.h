@@ -24,7 +24,7 @@ typedef enum {
 } CalcGetResultResult;
 
 /// @brief Creates `PostfixCalc`
-/// @param stack Pointer to store created `PostfixCalc` to
+/// @param calc Pointer to store created `PostfixCalc` to
 /// @return `true` if successful, `false` otherwise (allocation failed)
 bool calcCreate(PostfixCalc **calc);
 
@@ -51,5 +51,5 @@ CalcConsumeResult calcConsumeInput(PostfixCalc *calc, char input);
 CalcGetResultResult calcTryGetResult(PostfixCalc *calc, int *result);
 
 /// @brief Disposes calculator
-/// @param stack `PostfixCalc` to dispose
+/// @param calc `PostfixCalc` to dispose
 void calcDispose(PostfixCalc *calc);
