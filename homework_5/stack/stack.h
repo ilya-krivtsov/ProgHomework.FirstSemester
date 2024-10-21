@@ -34,5 +34,5 @@ bool stackTryPeek(Stack *stack, uint64_t *value);
 bool stackIsEmpty(Stack *stack);
 
 /// @brief Disposes stack and all of its elements
-/// @param stack `Stack` to dispose 
+/// @param stack `Stack` to dispose
 void stackDispose(Stack *stack);
