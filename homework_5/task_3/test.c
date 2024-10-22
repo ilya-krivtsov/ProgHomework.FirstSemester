@@ -38,12 +38,12 @@ void assertOutput(ShuntingYard *yard, const char *input, const char *expectedOut
 void testYard(const char *input, const char *expectedOutput) {
     ShuntingYard *yard = createYard();
     assertOutput(yard, input, expectedOutput);
-    free(yard);
+    shuntingYardDispose(yard);
 }
 
 CTEST(yardTests, createTest) {
     ShuntingYard *yard = createYard();
-    free(yard);
+    shuntingYardDispose(yard);
 }
 
 CTEST(yardTests, singleNumberTest) {
