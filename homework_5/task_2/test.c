@@ -35,12 +35,12 @@ void testCalc(const char *input, int expected) {
 
     assertConsumeString(calc, input, expected);
 
-    free(calc);
+    calcDispose(calc);
 }
 
 CTEST(postfixCalcTests, createTest) {
     PostfixCalc *calc = createCalc();
-    free(calc);
+    calcDispose(calc);
 }
 
 CTEST(postfixCalcTests, singleNumberTest) {
