@@ -37,7 +37,7 @@ void assertPeek(Stack *stack, uint64_t value) {
 CTEST(stackTests, createTest) {
     Stack *stack = createStack();
     ASSERT_TRUE(stackIsEmpty(stack));
-    free(stack);
+    stackDispose(stack);
 }
 
 #pragma region Push & Pop
@@ -50,7 +50,7 @@ CTEST(stackTests, pushPopTestA) {
 
     ASSERT_TRUE(stackIsEmpty(stack));
 
-    free(stack);
+    stackDispose(stack);
 }
 
 CTEST(stackTests, pushPopTestB) {
@@ -70,7 +70,7 @@ CTEST(stackTests, pushPopTestB) {
     assertPop(stack, 1245);
     ASSERT_TRUE(stackIsEmpty(stack));
 
-    free(stack);
+    stackDispose(stack);
 }
 
 CTEST(stackTests, pushPopTestC) {
@@ -88,7 +88,7 @@ CTEST(stackTests, pushPopTestC) {
     assertPop(stack, 2352);
     ASSERT_TRUE(stackIsEmpty(stack));
 
-    free(stack);
+    stackDispose(stack);
 }
 
 #pragma endregion
@@ -103,7 +103,7 @@ CTEST(stackTests, pushPeekTestA) {
 
     ASSERT_FALSE(stackIsEmpty(stack));
 
-    free(stack);
+    stackDispose(stack);
 }
 
 CTEST(stackTests, pushPeekTestB) {
@@ -123,7 +123,7 @@ CTEST(stackTests, pushPeekTestB) {
     assertPeek(stack, 44362);
     ASSERT_FALSE(stackIsEmpty(stack));
 
-    free(stack);
+    stackDispose(stack);
 }
 
 CTEST(stackTests, pushPeekTestC) {
@@ -141,7 +141,7 @@ CTEST(stackTests, pushPeekTestC) {
     assertPeek(stack, 7777777);
     ASSERT_FALSE(stackIsEmpty(stack));
 
-    free(stack);
+    stackDispose(stack);
 }
 
 #pragma endregion
