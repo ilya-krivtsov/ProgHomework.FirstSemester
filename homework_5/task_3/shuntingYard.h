@@ -18,7 +18,7 @@ bool shuntingYardCreate(ShuntingYard **yard);
 
 /// @brief Tries to read input to shunting yard
 /// @param yard Pointer to `ShuntingYard` instance
-/// @param input Input to read
+/// @param input Input to read (use `'\0'` flush remaining characters to buffer)
 /// @param outputBuffer Buffer to write to
 /// @param bufferLength Length of buffer; used to prevent buffer overflow
 /// @param bufferPosition Position in buffer to write character into
