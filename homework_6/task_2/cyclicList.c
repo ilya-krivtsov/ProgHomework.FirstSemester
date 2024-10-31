@@ -8,22 +8,26 @@ typedef struct ListElement {
     int value;
 } ListElement;
 
-bool addElementAfter(ListElement *element, ListElement **newElement, int value) {
-    *newElement = malloc(sizeof(ListElement));
-    if (*newElement == NULL) {
+bool addElementAfter(ListElement *previous, ListElement **newElement, int value) {
+    ListElement *element = malloc(sizeof(ListElement));
+    if (element == NULL) {
         return false;
     }
 
-    if (element == NULL) {
-        (*newElement)->left = *newElement;
-        (*newElement)->right = *newElement;
+    if (previous == NULL) {
+        element->left = element;
+        element->right = element;
     } else {
-        (*newElement)->left = element;
-        (*newElement)->right = element->right;
-        element->right = *newElement;
+        ListElement *next = previous->right;
+        element->left = previous;
+        element->right = next;
+
+        next->left = element;
+        previous->right = element;
     }
 
-    (*newElement)->value = value;
+    element->value = value;
+    *newElement = element;
 
     return true;
 }
@@ -37,8 +41,10 @@ int getValue(ListElement *element) {
 }
 
 void removeElement(ListElement *element) {
-    element->left->right = element->right;
-    element->right->left = element->left;
+    ListElement *left = element->left;
+    ListElement *right = element->right;
+    left->right = right;
+    right->left = left;
     free(element);
 }
 
