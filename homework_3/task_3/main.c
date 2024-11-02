@@ -18,6 +18,7 @@ int readValue(const char *prompt, const char *incorrectValueMessage) {
         while (getchar() != '\n') {}
         printf("%s", incorrectValueMessage);
     }
+    return value;
 }
 
 long long measureTime(void (*sort)(int *, int), int *array, int arrayLength) {

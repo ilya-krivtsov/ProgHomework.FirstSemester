@@ -16,6 +16,7 @@ int readValue(const char *prompt, const char *incorrectValueMessage) {
         while (getchar() != '\n') {}
         printf("%s", incorrectValueMessage);
     }
+    return value;
 }
 
 int main(void) {
