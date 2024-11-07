@@ -2,15 +2,6 @@
     "files.associations": {
         "*.h": "c"
     },
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        "**/*.out": true,
-    },
     "C_Cpp.formatting": "vcFormat",
     "C_Cpp.vcFormat.newLine.beforeElse": false,
     "C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "ignore",
