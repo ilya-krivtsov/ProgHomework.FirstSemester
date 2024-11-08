@@ -70,7 +70,7 @@ State printListCommand(SortedList *list) {
         printf("%d", getValue(element));
 
         element = getNext(element);
-        if (element != NULL & getNext(element) != NULL) {
+        if (element != NULL) {
             printf(", ");
         }
     }
