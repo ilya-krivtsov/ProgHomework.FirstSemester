@@ -141,3 +141,18 @@ bool removeFromDictionary(IntStringDictionary *dictionary, int key) {
     rightmostInLeft->right = node->right;
     // TODO: set parents left/right as node->right
 }
+
+void disposeNode(Node *node) {
+    if (node == NULL) {
+        return;
+    }
+
+    disposeNode(node->left);
+    disposeNode(node->right);
+    free(node);
+}
+
+void disposeDictionary(IntStringDictionary *dictionary) {
+    disposeNode(dictionary->root);
+    free(dictionary);
+}
