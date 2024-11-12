@@ -83,6 +83,8 @@ CTEST(dictonaryTests, randomEntriesTest) {
 
     srand(453563458);
 
+    const char *string = "random_string";
+
     const int minValue = -14274;
     const int maxValue = 17343;
     for (int i = 0; i < size; ++i) {
@@ -101,7 +103,7 @@ CTEST(dictonaryTests, randomEntriesTest) {
             }
         }
 
-        values[i] = NULL;
+        values[i] = string;
     }
 
     assertAddingAndRemoving(keys, values, size);
