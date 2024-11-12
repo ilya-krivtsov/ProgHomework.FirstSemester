@@ -1,6 +1,7 @@
 #include "intStringDictionary.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct Node {
     int key;
@@ -31,7 +32,13 @@ static bool createNode(Node **node, int key, char *value) {
     }
 
     (*node)->key = key;
-    (*node)->value = value;
+
+    char *valueCopy = strdup(value);
+    if (valueCopy == NULL) {
+        return false;
+    }
+    (*node)->value = valueCopy;
+
     (*node)->left = NULL;
     (*node)->right = NULL;
 
@@ -48,7 +55,12 @@ static bool addAfterNode(Node *node, int key, char *value) {
         } else if (key < parent->key) {
             child = parent->left;
         } else {
-            parent->value = value;
+            free(parent->value);
+            char *valueCopy = strdup(value);
+            if (valueCopy == NULL) {
+                return false;
+            }
+            parent->value = valueCopy;
             return true;
         }
     }
@@ -177,6 +189,8 @@ void disposeNode(Node *node) {
 
     disposeNode(node->left);
     disposeNode(node->right);
+
+    free(node->value);
     free(node);
 }
 
