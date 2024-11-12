@@ -18,9 +18,7 @@ void addEntryCommand(IntStringDictionary *dictionary) {
         return;
     }
 
-    char *newString = strdup(buffer);
-
-    if (newString == NULL || !addToDictionary(dictionary, key, newString)) {
+    if (!addToDictionary(dictionary, key, buffer)) {
         printf("Error: cannot add new entry\n");
     }
 }
