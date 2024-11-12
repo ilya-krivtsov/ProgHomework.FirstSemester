@@ -167,6 +167,7 @@ bool removeFromDictionary(IntStringDictionary *dictionary, int key) {
     rightmostInLeft->right = node->right;
     *setNewNodeTo = node->left;
     free(node);
+    return true;
 }
 
 void disposeNode(Node *node) {
