@@ -1,6 +1,6 @@
 #pragma once
 
-/// @brief Dictionary of `int` keys associated with `const char *` values
+/// @brief Dictionary of `int` keys associated with `char *` values
 typedef struct IntStringDictionary IntStringDictionary;
 
 /// @brief Creates new dictionary
@@ -13,13 +13,13 @@ bool createDictionary(IntStringDictionary **dictionary);
 /// @param key Key to add
 /// @param value Value to add
 /// @return `true` if added successfully, `false` otherwise (allocation failed)
-bool addToDictionary(IntStringDictionary *dictionary, int key, const char *value);
+bool addToDictionary(IntStringDictionary *dictionary, int key, char *value);
 
 /// @brief Gets value corresponding to given key
 /// @param dictionary Dictionary to get value from
 /// @param key Key associated with value
 /// @return String associated with key, or `NULL` if value was not found
-const char *getValue(IntStringDictionary *dictionary, int key);
+char *getValue(IntStringDictionary *dictionary, int key);
 
 /// @brief Checks if dictionary contains given key
 /// @param dictionary Dictionary to check

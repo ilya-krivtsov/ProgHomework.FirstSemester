@@ -4,7 +4,7 @@
 
 typedef struct Node {
     int key;
-    const char *value;
+    char *value;
     struct Node *left;
     struct Node *right;
 } Node;
@@ -24,7 +24,7 @@ bool createDictionary(IntStringDictionary **dictionary) {
     return true;
 }
 
-static bool createNode(Node **node, int key, const char *value) {
+static bool createNode(Node **node, int key, char *value) {
     *node = malloc(sizeof(Node));
     if (*node == NULL) {
         return false;
@@ -38,7 +38,7 @@ static bool createNode(Node **node, int key, const char *value) {
     return true;
 }
 
-static bool addAfterNode(Node *node, int key, const char *value) {
+static bool addAfterNode(Node *node, int key, char *value) {
     Node *parent = NULL;
     Node *child = node;
     while (child != NULL) {
@@ -62,7 +62,7 @@ static bool addAfterNode(Node *node, int key, const char *value) {
     return createNode(childPointer, key, value);
 }
 
-bool addToDictionary(IntStringDictionary *dictionary, int key, const char *value) {
+bool addToDictionary(IntStringDictionary *dictionary, int key, char *value) {
     if (dictionary->root == NULL) {
         return createNode(&dictionary->root, key, value);
     }
@@ -88,7 +88,7 @@ Node *getNode(Node *node, int key) {
     return node;
 }
 
-const char *getValue(IntStringDictionary *dictionary, int key) {
+char *getValue(IntStringDictionary *dictionary, int key) {
     Node *node = getNode(dictionary->root, key);
 
     return node == NULL ? NULL : node->value;
