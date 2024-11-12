@@ -57,7 +57,7 @@ static bool addAfterNode(Node *node, int key, const char *value) {
         return false;
     }
 
-    Node **childPointer = key > parent->key ? &parent->right: &node->left;
+    Node **childPointer = key > parent->key ? &parent->right: &parent->left;
 
     return createNode(childPointer, key, value);
 }
