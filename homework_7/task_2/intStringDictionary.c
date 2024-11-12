@@ -100,43 +100,73 @@ bool containsKey(IntStringDictionary *dictionary, int key) {
     return node != NULL;
 }
 
+// returns rightmost child of given node, or node itself if right is NULL
+Node *getRightmost(Node *node) {
+    while (node->right != NULL) {
+        node = node->right;
+    }
+    return node;
+}
+
 bool removeFromDictionary(IntStringDictionary *dictionary, int key) {
-    Node *node = getNode(dictionary->root, key);
-    if (node == NULL) {
-        return false;
+    Node *node = dictionary->root;
+    Node *previous = NULL;
+    while (true) {
+        if (node == NULL) {
+            return false;
+        }
+
+        if (key < node->key) {
+            previous = node;
+            node = node->left;
+        } else if (key > node->key) {
+            previous = node;
+            node = node->right;
+        } else {
+            break;
+        }
     }
 
     if (node == dictionary->root) {
         if (node->left == NULL) {
             dictionary->root = node->right;
+            free(node);
             return true;
         }
 
         if (node->right == NULL) {
             dictionary->root = node->left;
+            free(node);
             return true;
         }
 
-        Node *rightmostInLeft = NULL; // TODO: add rightmost search
+        Node *rightmostInLeft = getRightmost(node->left);
         rightmostInLeft->right = node->right;
         dictionary->root = node->left;
+
+        free(node);
 
         return true;
     }
 
+    Node **setNewNodeTo = key < previous->key ? &previous->left : &previous->right;
+
     if (node->left == NULL) {
-        // TODO: set parents left/right as node->right
+        *setNewNodeTo = node->right;
+        free(node);
         return true;
     }
 
     if (node->right == NULL) {
-        // TODO: set parents left/right as node->left
+        *setNewNodeTo = node->left;
+        free(node);
         return true;
     }
 
-    Node *rightmostInLeft = NULL; // TODO: add rightmost search
+    Node *rightmostInLeft = getRightmost(node->left);
     rightmostInLeft->right = node->right;
-    // TODO: set parents left/right as node->right
+    *setNewNodeTo = node->left;
+    free(node);
 }
 
 void disposeNode(Node *node) {
