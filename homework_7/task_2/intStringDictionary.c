@@ -71,17 +71,14 @@ bool addToDictionary(IntStringDictionary *dictionary, int key, const char *value
 }
 
 Node *getNode(Node *node, int key) {
-    Node *previous = NULL;
     while (true) {
         if (node == NULL) {
             return NULL;
         }
 
         if (key < node->key) {
-            previous = node;
             node = node->left;
         } else if (key > node->key) {
-            previous = node;
             node = node->right;
         } else {
             break;
