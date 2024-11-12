@@ -25,7 +25,7 @@ bool createDictionary(IntStringDictionary **dictionary) {
     return true;
 }
 
-static bool createNode(Node **node, int key, char *value) {
+static bool createNode(Node **node, int key, const char *value) {
     *node = malloc(sizeof(Node));
     if (*node == NULL) {
         return false;
@@ -45,7 +45,7 @@ static bool createNode(Node **node, int key, char *value) {
     return true;
 }
 
-static bool addAfterNode(Node *node, int key, char *value) {
+static bool addAfterNode(Node *node, int key, const char *value) {
     Node *parent = NULL;
     Node *child = node;
     while (child != NULL) {
@@ -74,7 +74,7 @@ static bool addAfterNode(Node *node, int key, char *value) {
     return createNode(childPointer, key, value);
 }
 
-bool addToDictionary(IntStringDictionary *dictionary, int key, char *value) {
+bool addToDictionary(IntStringDictionary *dictionary, int key, const char *value) {
     if (dictionary->root == NULL) {
         return createNode(&dictionary->root, key, value);
     }

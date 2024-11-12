@@ -13,7 +13,7 @@ bool createDictionary(IntStringDictionary **dictionary);
 /// @param key Key to add
 /// @param value Value to add
 /// @return `true` if added successfully, `false` otherwise (allocation failed)
-bool addToDictionary(IntStringDictionary *dictionary, int key, char *value);
+bool addToDictionary(IntStringDictionary *dictionary, int key, const char *value);
 
 /// @brief Gets value corresponding to given key
 /// @param dictionary Dictionary to get value from
