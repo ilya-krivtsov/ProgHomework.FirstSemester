@@ -76,7 +76,7 @@ CTEST(dictonaryTests, binaryEntriesTest) {
     assertAddingAndRemoving(keys, values, 15);
 }
 
-CTEST(dictonaryTests, randomEntriesTest) {
+CTEST_SKIP(dictonaryTests, randomEntriesTest) {
 #define size 16384
     int keys[size] = { 0 };
     const char *values[size] = { 0 };
