@@ -76,34 +76,27 @@ CTEST(dictonaryTests, binaryEntriesTest) {
     assertAddingAndRemoving(keys, values, 15);
 }
 
-CTEST_SKIP(dictonaryTests, randomEntriesTest) {
+CTEST(dictonaryTests, randomEntriesTest) {
 #define size 16384
     int keys[size] = { 0 };
     const char *values[size] = { 0 };
 
+    const char *string = "random_string";
+    for (int i = 0; i < size; ++i) {
+        keys[i] = i * 2 - 24517;
+        values[i] = string;
+    }
+
     srand(453563458);
 
-    const char *string = "random_string";
-
-    const int minValue = -14274;
-    const int maxValue = 17343;
     for (int i = 0; i < size; ++i) {
-        while (true) {
-            int value = rand() * (maxValue - minValue) / RAND_MAX + minValue;
-            bool contains = false;
-            for (int j = 0; j < i; ++j) {
-                if (keys[j] == value) {
-                    contains = true;
-                    break;
-                }
-            }
-            if (!contains) {
-                keys[i] = value;
-                break;
-            }
-        }
+        int index = (rand() % (size - i)) + i;
 
-        values[i] = string;
+        int key = keys[i];
+        keys[i] = keys[index];
+        keys[index] = key;
+
+        // dont swap values, they are all the same
     }
 
     assertAddingAndRemoving(keys, values, size);
