@@ -23,7 +23,7 @@ int main(void) {
         // consider that function A is noticeably slower than function B if
         // A executes more at least twice as slow as B and takes more than 500 ms
         if ((recursiveTimeMillis / iterativeTimeMillis) > 2 && recursiveTimeMillis > 500.0) {
-            printf("recusive algorithm is noticeably slower than iterative at iteration %lu:\n", n);
+            printf("recusive algorithm is noticeably slower than iterative at iteration %llu:\n", n);
             printf("fibonacciIterative took %.2f ms;\n", iterativeTimeMillis);
             printf("fibonacciRecursive took %.2f ms\n", recursiveTimeMillis);
 

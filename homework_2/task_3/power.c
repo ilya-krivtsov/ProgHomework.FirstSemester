@@ -2,7 +2,7 @@
 
 uint64_t powerNaive(uint64_t base, uint64_t exponent) {
     uint64_t result = 1;
-    for (int i = 0; i < exponent; ++i) {
+    for (uint64_t i = 0; i < exponent; ++i) {
         result *= base;
     }
 
