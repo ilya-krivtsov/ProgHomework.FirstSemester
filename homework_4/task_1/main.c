@@ -41,7 +41,7 @@ void printStep(int8_t left, int8_t right, int8_t accumulatedResult, int8_t accum
         // 0th step prints 4 lines, 1st step and further - 6, and user inputs one more
         const int clearLines = (steps == 1 ? 4 : 6) + 1;
 
-        // move cursor back, clear all lines and move cursor again 
+        // move cursor back, clear all lines and move cursor again
         printf("\e[%dA", clearLines);
         for (int i = 0; i < clearLines; ++i) {
             printf("\e[K\n");
