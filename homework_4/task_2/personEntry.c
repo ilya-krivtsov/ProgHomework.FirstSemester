@@ -16,7 +16,7 @@ bool tryParsePhoneNumber(const char *input, PhoneNumber *phoneNumber) {
 
     bool hasOpenParen = false, hyphen = false;
 
-    for (int i = 0, j = 0; i < sizeof(buffer) - 1; ++i) {
+    for (int i = 0, j = 0; i < (int)sizeof(buffer) - 1; ++i) {
         char c = input[i];
         if (c == '\0') {
             break;

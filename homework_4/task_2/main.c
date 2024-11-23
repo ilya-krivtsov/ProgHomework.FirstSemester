@@ -21,7 +21,7 @@ char *readLine(const char *prompt) {
     printf("%s", prompt);
 
     bool overflow = true;
-    for (int i = 0; i < sizeof(buffer) - 1; ++i) {
+    for (int i = 0; i < (int)sizeof(buffer) - 1; ++i) {
         char c = getchar();
         if (c == '\n' || c == EOF) {
             overflow = false;
