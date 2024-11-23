@@ -12,6 +12,12 @@ uint64_t measureTime(uint64_t(*fib)(uint64_t), int n) {
     return (endTime.tv_nsec - startTime.tv_nsec) + (endTime.tv_sec - startTime.tv_sec) * 1000 * 1000 * 1000;
 }
 
+// see homework_2/task_3/main.c
+#ifdef __MINGW64__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat"
+#endif
+
 int main(void) {
     const int maxIteration = 200;
     for (int i = 0; i <= maxIteration; ++i) {
@@ -33,3 +39,7 @@ int main(void) {
 
     printf("recursive algorithm wasn't much slower than iterative in range of values [0, %d]\n", maxIteration);
 }
+
+#ifdef __MINGW64__
+#pragma GCC diagnostic pop
+#endif
