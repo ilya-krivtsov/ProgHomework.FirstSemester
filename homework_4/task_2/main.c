@@ -204,8 +204,10 @@ bool doConversation(void) {
 
         if (database == NULL) {
             printf("Error: cannot load database; create new? (y/n): ");
-            char choice;
-            scanf("%c", &choice);
+            char choice = 'n';
+            if (scanf("%c", &choice) != 1) {
+                return false;
+            }
             if (choice == 'y') {
                 database = createDatabase();
             } else {
