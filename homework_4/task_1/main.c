@@ -56,7 +56,7 @@ void printStep(int8_t left, int8_t right, int8_t accumulatedResult, int8_t accum
     printf(" ");
     // print all carry bits
     for (int i = bitWidth - 1; i >= 0; --i) {
-        if ((accumulatedCarry >> i) & 1 == 1) {
+        if (((accumulatedCarry >> i) & 1) == 1) {
             if (i + 1 == steps) {
                 printf(ANSI_BG_YELLOW "." ANSI_RESET);
             } else {
