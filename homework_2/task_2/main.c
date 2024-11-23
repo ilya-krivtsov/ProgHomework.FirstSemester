@@ -41,8 +41,8 @@ bool measureMeanTime(bool (*sortingAlgoritm)(int *, int), int *array, int arrayL
 int main(void) {
     const int arrayLength = 100000;
 
-    int *countingSortArray = calloc(arrayLength, sizeof(int)),
-        *bubbleSortArray = calloc(arrayLength, sizeof(int));
+    int *countingSortArray = calloc(arrayLength, sizeof(int));
+    int *bubbleSortArray = calloc(arrayLength, sizeof(int));
 
     if (countingSortArray == NULL || bubbleSortArray == NULL) {
         free(countingSortArray);
