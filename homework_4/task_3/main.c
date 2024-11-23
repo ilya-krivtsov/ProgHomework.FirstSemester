@@ -7,7 +7,10 @@
 int main(void) {
     char buffer[1024];
     printf("input file path: ");
-    scanf("%1023s", buffer);
+    if (scanf("%1023s", buffer) != 1) {
+        printf("couldn't open file\n");
+        return 1;
+    }
 
     FILE *file = fopen(buffer, "r");
     if (file == NULL) {
