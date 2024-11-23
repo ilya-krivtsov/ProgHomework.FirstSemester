@@ -17,68 +17,82 @@ int main(int argc, const char *argv[]) {
 
 #define SAVE_PATH "test_tmp_db"
 
-CTEST_DATA(databaseTests) {
-    Database *database;
-};
-
-CTEST_SETUP(databaseTests) {
-    data->database = createDatabase();
-    ASSERT_NOT_NULL(data->database);
+Database *createNewDatabase(void) {
+    Database *db = createDatabase();
+    ASSERT_NOT_NULL(db);
+    return db;
 }
 
-CTEST_TEARDOWN(databaseTests) {
-    disposeDatabase(data->database);
-}
-
-CTEST2(databaseTests, addEntryTest) {
+void assertAddEntry(Database *database, const char *personName, const PhoneNumber phoneNumber) {
     PersonEntry entry = {
-        .personName = strdup(NAME_1),
-        .phoneNumber = strdup(PHONE_1)
+        .personName = strdup(personName),
+        .phoneNumber = strdup(phoneNumber)
     };
 
-    ASSERT_TRUE(addEntry(data->database, entry));
-    ASSERT_STR(data->database->entries[data->database->entriesCount - 1].personName, NAME_1);
-    ASSERT_STR(data->database->entries[data->database->entriesCount - 1].phoneNumber, PHONE_1);
+    ASSERT_TRUE(addEntry(database, entry));
+    ASSERT_STR(database->entries[database->entriesCount - 1].personName, personName);
+    ASSERT_STR(database->entries[database->entriesCount - 1].phoneNumber, phoneNumber);
 }
 
-CTEST2(databaseTests, addEntryTest2) {
-    PersonEntry entry = {
-        .personName = strdup(NAME_2),
-        .phoneNumber = strdup(PHONE_2)
-    };
-
-    ASSERT_TRUE(addEntry(data->database, entry));
-    ASSERT_STR(data->database->entries[data->database->entriesCount - 1].personName, NAME_2);
-    ASSERT_STR(data->database->entries[data->database->entriesCount - 1].phoneNumber, PHONE_2);
+void assertAddNamesAndPhones(Database *db) {
+    assertAddEntry(db, NAME_1, PHONE_1);
+    assertAddEntry(db, NAME_2, PHONE_2);
 }
 
-CTEST2(databaseTests, saveDatabaseTest) {
+void assertSave(Database *db) {
     FILE *file = fopen(SAVE_PATH, "w");
     ASSERT_NOT_NULL(file);
 
-    ASSERT_TRUE(saveDatabase(file, data->database));
+    ASSERT_TRUE(saveDatabase(file, db));
     ASSERT_EQUAL(fclose(file), 0);
 }
 
-CTEST2(databaseTests, loadDatabaseTest) {
+Database *loadTestDatabase(void) {
     FILE *file = fopen(SAVE_PATH, "r");
     ASSERT_NOT_NULL(file);
 
-    Database *database2 = loadDatabase(file);
+    Database *db = loadDatabase(file);
 
-    ASSERT_NOT_NULL(database2);
+    ASSERT_NOT_NULL(db);
     ASSERT_EQUAL(fclose(file), 0);
+    return db;
+}
 
-    ASSERT_EQUAL(data->database->entriesCount, database2->entriesCount);
-    for (int i = 0; i < data->database->entriesCount; ++i) {
-        PersonEntry entry = data->database->entries[i],
-            entry2 = database2->entries[i];
+CTEST(databaseTests, addEntriesTest) {
+    Database *db = createNewDatabase();
+    assertAddNamesAndPhones(db);
+    disposeDatabase(db);
+}
+
+CTEST(databaseTests, saveDatabaseTest) {
+    Database *db = createNewDatabase();
+
+    assertAddNamesAndPhones(db);
+    assertSave(db);
+
+    disposeDatabase(db);
+}
+
+CTEST(databaseTests, loadDatabaseTest) {
+    Database *db = createNewDatabase();
+
+    assertAddNamesAndPhones(db);
+    assertSave(db);
+
+    Database *db2 = loadTestDatabase();
+
+    ASSERT_EQUAL(db->entriesCount, db2->entriesCount);
+    for (int i = 0; i < db->entriesCount; ++i) {
+        PersonEntry entry = db->entries[i],
+            entry2 = db2->entries[i];
         ASSERT_STR(entry.personName, entry2.personName);
         ASSERT_STR(entry.phoneNumber, entry2.phoneNumber);
     }
 
-    disposeDatabase(database2);
+    disposeDatabase(db2);
     ASSERT_EQUAL(remove(SAVE_PATH), 0);
+
+    disposeDatabase(db);
 }
 
 CTEST(phoneParsingTest, incorrectPhoneTest) {
