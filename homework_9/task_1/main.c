@@ -79,7 +79,7 @@ void writeToBuffer(int utfChar, char *buffer, int *bufferIndex, int bufferLength
     }
 }
 
-int  partition(const char **strings, int *frequencies, int left, int right) {
+int partition(const char **strings, int *frequencies, int left, int right) {
     if (left >= right) {
         return left;
     }
