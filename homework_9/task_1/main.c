@@ -4,48 +4,6 @@
 
 #include "frequencyLookup.h"
 
-int partition(const char **strings, int *frequencies, int left, int right) {
-    if (left >= right) {
-        return left;
-    }
-
-    int pivot = frequencies[left];
-    --left;
-    ++right;
-    while (true) {
-        do {
-            ++left;
-        } while (frequencies[left] < pivot);
-        do {
-            --right;
-        } while (frequencies[right] > pivot);
-
-        if (left >= right) {
-            break;
-        }
-
-        int frequency = frequencies[left];
-        frequencies[left] = frequencies[right];
-        frequencies[right] = frequency;
-
-        const char *string = strings[left];
-        strings[left] = strings[right];
-        strings[right] = string;
-    }
-
-    return right;
-}
-
-void sortStrings(const char **strings, int *frequencies, int left, int right) {
-    if (left >= right) {
-        return;
-    }
-
-    int part = partition(strings, frequencies, left, right);
-    sortStrings(strings, frequencies, left, part);
-    sortStrings(strings, frequencies, part + 1, right);
-}
-
 bool isNonWord(char c) {
     return c == ' ' || c == EOF || c == '\n' || c == '\r';
 }
@@ -110,8 +68,6 @@ int main(void) {
         ++index;
     }
     disposeIterator(iterator);
-
-    sortStrings(strings, frequencies, 0, count - 1);
 
     printf("words:\n");
 
