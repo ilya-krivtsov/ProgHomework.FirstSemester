@@ -117,11 +117,7 @@ int main(void) {
 
     for (int i = 0; i < count; ++i) {
         int j = count - i - 1;
-        printf("%s : %d\n", strings[j], frequencies[j]);
-
-        if (i >= 20) {
-            break;
-        }
+        printf("\"%s\" : %d\n", strings[j], frequencies[j]);
     }
 
     disposeLookup(lookup);
