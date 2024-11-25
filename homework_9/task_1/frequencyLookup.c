@@ -66,12 +66,6 @@ static void disposeBuckets(FrequencyLookup *lookup) {
 }
 
 static bool expandLookup(FrequencyLookup *lookup) {
-    int minBucketLength = getMinBucketLength(lookup);
-    int maxBucketLength = getMaxBucketLength(lookup);
-    printf("before expanding:\n");
-    printf("old: [capacity: %d, min length: %d, max length: %d]\n", lookup->capacity, minBucketLength, maxBucketLength);
-    printf("old [occup: %lf]\n", (float)lookup->count / lookup->capacity);
-
     int newCapacity = lookup->capacity * 4;
 
     FrequencyLookup *newLookup = NULL;
@@ -99,16 +93,9 @@ static bool expandLookup(FrequencyLookup *lookup) {
     // free(), because disposeLookup() will dispose buckets
     free(newLookup);
 
-    minBucketLength = getMinBucketLength(lookup);
-    maxBucketLength = getMaxBucketLength(lookup);
-    printf("expanded lookup;\n");
-    printf("new: [capacity: %d, min length: %d, max length: %d]\n", lookup->capacity, minBucketLength, maxBucketLength);
-    printf("new [occup: %lf]\n", (float)lookup->count / lookup->capacity);
-
     return true;
 }
 
-// adds or creates new element
 bool addFrequency(FrequencyLookup *lookup, const char *string, int frequency) {
     if ((float)lookup->count / lookup->capacity > 4.0) {
         expandLookup(lookup);
