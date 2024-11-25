@@ -109,6 +109,7 @@ int main(void) {
         frequencies[index] = frequency;
         ++index;
     }
+    disposeIterator(iterator);
 
     sortStrings(strings, frequencies, 0, count - 1);
 
@@ -122,8 +123,6 @@ int main(void) {
             break;
         }
     }
-
-    disposeIterator(iterator);
 
     disposeLookup(lookup);
 
