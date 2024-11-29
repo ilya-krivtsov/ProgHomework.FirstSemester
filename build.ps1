@@ -175,7 +175,6 @@ $configuration = 'Debug'
 $command = 'undefined_command'
 $quietBuild = $false
 $quietTest = $false
-$rootFile = $null
 for ($i = 0; $i -lt $args.Count; $i++)
 {
     $arg = $args[$i]
@@ -220,11 +219,11 @@ for ($i = 0; $i -lt $args.Count; $i++)
         { ($_ -eq '-qt') -or ($_ -eq '--quiet-test') } { $quietTest = $true }
         { ($_ -eq '-c') -or ($_ -eq '--clear') } { Remove-Item -Recurse -Force -ErrorAction Ignore $buildDirectory }
         { $_ -eq 'clear' } { Remove-Item -Recurse -Force -ErrorAction Ignore $buildDirectory; exit 0 }
-        default  { Write-Error "unknown argument: $arg"; exit 1 }
+        default { Write-Error "unknown argument: $arg"; exit 1 }
     }
 }
 
-if ($command -eq 'undefined_command' )
+if ($command -eq 'undefined_command')
 {
     Write-Error "command not specified"
     exit 1
