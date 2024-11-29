@@ -30,6 +30,7 @@ void assertExpression(const char *expression, int expectedResult) {
     ASSERT_NOT_NULL(file);
     ExpressionTree *tree = readTree(file);
     ASSERT_EQUAL(fclose(file), 0);
+    ASSERT_EQUAL(remove(filename), 0);
 
     ASSERT_EQUAL(evaluateExpressionTree(tree), expectedResult);
 
