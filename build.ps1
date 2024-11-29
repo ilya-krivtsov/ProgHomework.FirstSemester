@@ -4,7 +4,7 @@ $buildDirectory = [System.IO.Path]::Combine($root, "build")
 
 if (Test-Path -Path config.env -PathType Leaf)
 {
-    Get-Content config.env | Foreach {
+    Get-Content config.env | ForEach-Object {
         $name, $value = $_.Split('=')
         Set-Content env:\$name $value
     }
@@ -44,22 +44,22 @@ if ($executableExtension -eq 'none')
     $executableExtension = ''
 }
 
-function Run-Command($command, $commandArgs, $workingDirectory, $quiet)
+function Invoke-Command($command, $commandArgs, $workingDirectory, $quiet)
 {
     $returnTo = $pwd
-    cd $workingDirectory
+    Set-Location $workingDirectory
     try
     {
         Invoke-Expression "& `"$command`" $commandArgs $(if ($quiet) {'| Out-Null'} else {''})"
     }
     finally
     {
-        cd $returnTo
+        Set-Location $returnTo
         if ($LastExitCode -ne 0) { exit 1 }
     }
 }
 
-function CMake-BuildInternal($target, $configuration, $quiet)
+function Invoke-CMakeBuildInternal($target, $configuration, $quiet)
 {
     $configurationCacheFile = "$buildDirectory/__last_configuration"
     $lastConfiguration = 'none'
@@ -75,43 +75,43 @@ function CMake-BuildInternal($target, $configuration, $quiet)
 
     if ($configuration -ne $lastConfiguration)
     {
-        Run-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=$configuration", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
+        Invoke-Command "$cmake" @("-DCMAKE_BUILD_TYPE:STRING=$configuration", "-DCMAKE_C_COMPILER:FILEPATH=$compiler",
             "-S", $root, "-B", $buildDirectory, "-G", "'$generator'") $root $quiet
 
         $configuration | Out-File $configurationCacheFile
     }
 
-    Run-Command "$cmake" @("--build", $buildDirectory, "--config", $configuration, "--target", $target, "-j", "14") $root $quiet
+    Invoke-Command "$cmake" @("--build", $buildDirectory, "--config", $configuration, "--target", $target, "-j", "14") $root $quiet
 }
 
-function CMake-RunInternal($homework, $task, $target, $quiet)
+function Invoke-CMakeRunInternal($homework, $task, $target, $quiet)
 {
-    Run-Command "$buildDirectory/$homework/$task/$target$executableExtension" @() "$root/$homework/$task" $quiet
+    Invoke-Command "$buildDirectory/$homework/$task/$target$executableExtension" @() "$root/$homework/$task" $quiet
 }
 
-function CMake-Build($homework, $task, $configuration, $quietBuild)
+function Invoke-CMakeBuild($homework, $task, $configuration, $quietBuild)
 {
-    CMake-BuildInternal "$($homework)_$task" $configuration $quietBuild
+    Invoke-CMakeBuildInternal "$($homework)_$task" $configuration $quietBuild
 }
 
-function CMake-Run($homework, $task, $configuration, $quietBuild)
+function Invoke-CMakeRun($homework, $task, $configuration, $quietBuild)
 {
-    CMake-Build $homework $task $configuration $quietBuild
-    CMake-RunInternal $homework $task "$($homework)_$task"
+    Invoke-CMakeBuild $homework $task $configuration $quietBuild
+    Invoke-CMakeRunInternal $homework $task "$($homework)_$task"
 }
 
-function CMake-BuildTest($homework, $task, $configuration, $quietBuild)
+function Invoke-CMakeBuildTest($homework, $task, $configuration, $quietBuild)
 {
-    CMake-BuildInternal "$($homework)_$($task)_test" $configuration $quietBuild
+    Invoke-CMakeBuildInternal "$($homework)_$($task)_test" $configuration $quietBuild
 }
 
-function CMake-Test($homework, $task, $configuration, $quietBuild, $quietTest)
+function Invoke-CMakeTest($homework, $task, $configuration, $quietBuild, $quietTest)
 {
-    CMake-BuildTest $homework $task $configuration $quietBuild
-    CMake-RunInternal $homework $task "$($homework)_$($task)_test" $quietTest
+    Invoke-CMakeBuildTest $homework $task $configuration $quietBuild
+    Invoke-CMakeRunInternal $homework $task "$($homework)_$($task)_test" $quietTest
 }
 
-function DoForeach-HomeworkAndTask($toRun, $isTest)
+function Invoke-ForeachHomeworkAndTask($toRun, $isTest)
 {
     $rootFile = './CMakeLists.txt'
     foreach ($rootLine in Get-Content $rootFile)
@@ -155,14 +155,14 @@ function DoForeach-HomeworkAndTask($toRun, $isTest)
     }
 }
 
-function CMake-BuildAll($configuration, $quietBuild)
+function Invoke-CMakeBuildAll($configuration, $quietBuild)
 {
-    DoForeach-HomeworkAndTask { param($homework, $task) CMake-Build $homework $task $configuration $quietBuild } $false
+    Invoke-ForeachHomeworkAndTask { param($homework, $task) Invoke-CMakeBuild $homework $task $configuration $quietBuild } $false
 }
 
-function CMake-TestAll($configuration, $quietBuild, $quietTest)
+function Invoke-CMakeTestAll($configuration, $quietBuild, $quietTest)
 {
-    DoForeach-HomeworkAndTask { param($homework, $task) CMake-Test $homework $task $configuration $quietBuild $quietTest } $true
+    Invoke-ForeachHomeworkAndTask { param($homework, $task) Invoke-CMakeTest $homework $task $configuration $quietBuild $quietTest } $true
 }
 
 $isDotSourced = $MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq ''
@@ -231,10 +231,10 @@ if ($command -eq 'undefined_command')
 
 switch ($command)
 {
-    build { Cmake-Build $homework $task $configuration $quietBuild }
-    run { Cmake-Run $homework $task $configuration $quietBuild }
-    buildTest { CMake-BuildTest $homework $task $configuration $quietBuild }
-    test { CMake-Test $homework $task $configuration $quietBuild $quietTest }
-    buildAll { CMake-BuildAll $configuration $quietBuild }
-    testAll { CMake-TestAll $configuration $quietBuild $quietTest }
+    build { Invoke-CMakeBuild $homework $task $configuration $quietBuild }
+    run { Invoke-CMakeRun $homework $task $configuration $quietBuild }
+    buildTest { Invoke-CMakeBuildTest $homework $task $configuration $quietBuild }
+    test { Invoke-CMakeTest $homework $task $configuration $quietBuild $quietTest }
+    buildAll { Invoke-CMakeBuildAll $configuration $quietBuild }
+    testAll { Invoke-CMakeTestAll $configuration $quietBuild $quietTest }
 }
