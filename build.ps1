@@ -111,25 +111,58 @@ function CMake-Test($homework, $task, $configuration, $quietBuild, $quietTest)
     CMake-RunInternal $homework $task "$($homework)_$($task)_test" $quietTest
 }
 
-function DoForeach-HomeworkAndTask($toRun)
+function DoForeach-HomeworkAndTask($toRun, $isTest)
 {
-    foreach ($homework in Get-ChildItem -Filter "homework_*")
+    $rootFile = './CMakeLists.txt'
+    foreach ($rootLine in Get-Content $rootFile)
     {
-        foreach ($task in Get-ChildItem $homework -Filter "task_*")
+        if (-not ($rootLine -match 'add_subdirectory\((.*)\)')) { continue }
+
+        $homework = $Matches.1
+        $hwFile = "./$homework/CMakeLists.txt"
+
+        if (-not (Test-Path -Path $hwFile -PathType Leaf))
         {
-            & $toRun $homework.Name $task.Name
+            Write-Host "homework file '$hwFile' not found"
+            exit 1
+        }
+
+        foreach ($hwLine in Get-Content $hwFile)
+        {
+            if (-not ($hwLine -match 'add_subdirectory\((.*)\)')) { continue }
+
+            $task = $Matches.1
+            $taskFile = "./$homework/$task/CMakeLists.txt"
+
+            if (-not (Test-Path -Path $hwFile -PathType Leaf))
+            {
+                Write-Host "task file '$taskFile' not found"
+                exit 1
+            }
+
+            foreach ($taskLine in Get-Content $taskFile)
+            {
+                if (-not ($taskLine -match 'add_executable\((.+) .+\)')) { continue }
+
+                $target = $Matches.1
+
+                if ($isTest -eq ($target -match '.+_test'))
+                {
+                    & $toRun $homework $task
+                }
+            }
         }
     }
 }
 
 function CMake-BuildAll($configuration, $quietBuild)
 {
-    DoForeach-HomeworkAndTask { param($homework, $task) CMake-Build $homework $task $configuration $quietBuild }
+    DoForeach-HomeworkAndTask { param($homework, $task) CMake-Build $homework $task $configuration $quietBuild } $false
 }
 
 function CMake-TestAll($configuration, $quietBuild, $quietTest)
 {
-    DoForeach-HomeworkAndTask { param($homework, $task) CMake-Test $homework $task $configuration $quietBuild $quietTest }
+    DoForeach-HomeworkAndTask { param($homework, $task) CMake-Test $homework $task $configuration $quietBuild $quietTest } $true
 }
 
 $isDotSourced = $MyInvocation.InvocationName -eq '.' -or $MyInvocation.Line -eq ''
@@ -142,6 +175,7 @@ $configuration = 'Debug'
 $command = 'undefined_command'
 $quietBuild = $false
 $quietTest = $false
+$rootFile = $null
 for ($i = 0; $i -lt $args.Count; $i++)
 {
     $arg = $args[$i]
