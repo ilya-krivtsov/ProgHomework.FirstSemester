@@ -41,6 +41,7 @@ static bool addEntry(EntryList *list, const char *name, const char *phoneNumber)
     entry->next = NULL;
 
     addToSpan(&list->span, entry);
+    return true;
 }
 
 bool readToList(EntryList **list, FILE *stream) {
