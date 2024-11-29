@@ -45,6 +45,10 @@ function run_command {
     else
         "$@"
     fi
+
+    if [[ $? -ne 0 ]]; then
+        exit 1
+    fi
 }
 
 # $1: target to build
@@ -113,37 +117,66 @@ function test {
     run_internal $1 $2 ${1}_${2}_test $5
 }
 
+# $1 - $4 parameters
+# $5 if running test
 function foreach_homework_and_task {
-    for homework_dir in */ ; do
-        if [[ ! $homework_dir =~ ^(homework_.+)/$ ]]; then
+    root_file='./CMakeLists.txt'
+    while IFS='' read -r root_line; do
+        if [[ ! $root_line =~ ^add_subdirectory\((.*)\)$ ]]; then
             continue
         fi
 
         homework=${BASH_REMATCH[1]}
+        hw_file="./$homework/CMakeLists.txt"
 
-        for task_dir in $homework_dir*/ ; do
-            if [[ ! $task_dir =~ ^${homework}/(task_.+)/$ ]]; then
+        if [[ ! -f "$hw_file" ]]; then
+            echo "homework file '$hw_file' not found"
+            exit 1
+        fi
+
+        while IFS='' read -r hw_line; do
+            if [[ ! $hw_line =~ ^add_subdirectory\((.*)\)$ ]]; then
                 continue
             fi
 
             task=${BASH_REMATCH[1]}
+            task_file="./$homework/$task/CMakeLists.txt"
 
-            $1 $homework $task $2 $3 $4
-        done
-    done
+            if [[ ! -f "$task_file" ]]; then
+                echo "task file '$task_file' not found"
+                exit 1
+            fi
+
+            while IFS='' read -r task_line; do
+                if [[ ! $task_line =~ ^add_executable\((.*)[[:space:]].*\)$ ]]; then
+                    continue
+                fi
+
+                target=${BASH_REMATCH[1]}
+
+                target_is_test=false
+
+                if [[ $target =~ _test ]]; then target_is_test=true; fi
+
+                if [[ $5 = $target_is_test ]]; then
+                    $1 $homework $task $2 $3 $4
+                fi
+            done < $task_file
+        done < $hw_file
+    done < $root_file
 }
 
 # $1: configuration
 # $2: quietBuild
 function buildAll {
-    foreach_homework_and_task build $1 $2
+    foreach_homework_and_task build $1 $2 '' false
 }
 
 # $1: configuration
 # $2: quietBuild
 # $3: quietTest
 function testAll {
-    foreach_homework_and_task test $1 $2 $3
+    foreach_homework_and_task test $1 $2 $3 true
 }
 
 configuration='Debug'
