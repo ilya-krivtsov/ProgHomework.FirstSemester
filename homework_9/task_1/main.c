@@ -50,7 +50,7 @@ int main(void) {
     int capacity = getCapacity(lookup);
     int maxBucketLength = getMaxBucketLength(lookup);
     float averageBucketLength = getAverageBucketLength(lookup);
-    printf("capacity: %d, max bucket length: %d, average length of non-empty buckets: %lf]\n", capacity, maxBucketLength, averageBucketLength);
+    printf("capacity: %d, max bucket length: %d, average length of non-empty buckets: %lf\n", capacity, maxBucketLength, averageBucketLength);
     printf("occupancy ratio: %lf\n", (float)count / capacity);
 
     const char **strings = malloc(sizeof(char *) * count);
