@@ -47,6 +47,11 @@ int getCapacity(FrequencyLookup *lookup);
 /// @return Max length of all buckets in lookup
 int getMaxBucketLength(FrequencyLookup *lookup);
 
+/// @brief Gets average length of non-empty buckets in lookup
+/// @param lookup A lookup
+/// @return Average length of non-empty buckets in lookup
+float getAverageBucketLength(FrequencyLookup *lookup);
+
 /// @brief Disposes lookup and all of its entries
 /// @param lookup Lookup to dispose
 void disposeLookup(FrequencyLookup *lookup);

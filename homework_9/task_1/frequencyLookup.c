@@ -174,6 +174,21 @@ int getMaxBucketLength(FrequencyLookup *lookup) {
     return length;
 }
 
+float getAverageBucketLength(FrequencyLookup *lookup) {
+    if (lookup->capacity == 0) {
+        return 0;
+    }
+
+    int totalLength = -1;
+    for (int i = 0; i < lookup->capacity; ++i) {
+        int bucketLength = getLength(lookup->buckets[i]);
+        if (bucketLength != 0) {
+            totalLength += bucketLength;
+        }
+    }
+    return (double)totalLength / lookup->capacity;
+}
+
 void disposeLookup(FrequencyLookup *lookup) {
     disposeBuckets(lookup);
     free(lookup);
