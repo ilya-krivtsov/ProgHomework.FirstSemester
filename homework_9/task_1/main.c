@@ -48,9 +48,8 @@ int main(void) {
     printf("word count: %d\n", count);
 
     int capacity = getCapacity(lookup);
-    int minBucketLength = getMinBucketLength(lookup);
     int maxBucketLength = getMaxBucketLength(lookup);
-    printf("capacity: %d, min bucket length: %d, max bucket length: %d]\n", capacity, minBucketLength, maxBucketLength);
+    printf("capacity: %d, max bucket length: %d]\n", capacity, maxBucketLength);
     printf("occupancy ratio: %lf\n", (float)count / capacity);
 
     const char **strings = malloc(sizeof(char *) * count);

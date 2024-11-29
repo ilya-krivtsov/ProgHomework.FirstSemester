@@ -163,17 +163,6 @@ int getCapacity(FrequencyLookup *lookup) {
     return lookup->capacity;
 }
 
-int getMinBucketLength(FrequencyLookup *lookup) {
-    int length = -1;
-    for (int i = 0; i < lookup->capacity; ++i) {
-        int bucketLength = getLength(lookup->buckets[i]);
-        if (length == -1 || bucketLength < length) {
-            length = bucketLength;
-        }
-    }
-    return length;
-}
-
 int getMaxBucketLength(FrequencyLookup *lookup) {
     int length = -1;
     for (int i = 0; i < lookup->capacity; ++i) {

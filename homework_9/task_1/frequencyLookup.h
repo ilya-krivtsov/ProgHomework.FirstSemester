@@ -42,11 +42,6 @@ int getCount(FrequencyLookup *lookup);
 /// @return Capacity of lookup
 int getCapacity(FrequencyLookup *lookup);
 
-/// @brief Gets min length of all buckets in lookup
-/// @param lookup A lookup
-/// @return Min length of all buckets in lookup
-int getMinBucketLength(FrequencyLookup *lookup);
-
 /// @brief Gets max length of all buckets in lookup
 /// @param lookup A lookup
 /// @return Max length of all buckets in lookup
