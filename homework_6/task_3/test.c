@@ -93,36 +93,33 @@ CTEST(sortedListTests, addAndRemoveElementsTest) {
     assertEqual(list, arrayA, size);
 
     ASSERT_TRUE(removeElement(list, -675));
-#define size 7
-    int arrayB[size] = { -234, 6, 62, 224, 543, 879, 4352 };
-    assertEqual(list, arrayB, size);
+    int arrayB[size - 1] = { -234, 6, 62, 224, 543, 879, 4352 };
+    assertEqual(list, arrayB, size - 1);
 
     ASSERT_TRUE(removeElement(list, 4352));
-#define size 6
-    int arrayC[size] = { -234, 6, 62, 224, 543, 879 };
-    assertEqual(list, arrayC, size);
+    int arrayC[size - 2] = { -234, 6, 62, 224, 543, 879 };
+    assertEqual(list, arrayC, size - 2);
 
     ASSERT_TRUE(removeElement(list, 224));
-#define size 5
-    int arrayD[size] = { -234, 6, 62, 543, 879 };
-    assertEqual(list, arrayD, size);
+    int arrayD[size - 3] = { -234, 6, 62, 543, 879 };
+    assertEqual(list, arrayD, size - 3);
 
     ASSERT_TRUE(removeElement(list, 543));
-#define size 4
-    int arrayE[size] = { -234, 6, 62, 879 };
-    assertEqual(list, arrayE, size);
+    int arrayE[size - 4] = { -234, 6, 62, 879 };
+    assertEqual(list, arrayE, size - 4);
 
     ASSERT_TRUE(removeElement(list, 6));
-#define size 3
-    int arrayF[size] = { -234, 62, 879 };
-    assertEqual(list, arrayF, size);
+    int arrayF[size - 5] = { -234, 62, 879 };
+    assertEqual(list, arrayF, size - 5);
 
     ASSERT_TRUE(removeElement(list, -234));
-#define size 2
-    int arrayG[size] = { 62, 879 };
-    assertEqual(list, arrayG, size);
+    int arrayG[size - 6] = { 62, 879 };
+    assertEqual(list, arrayG, size - 6);
 
     ASSERT_TRUE(removeElement(list, 879));
+    int arrayH[size - 7] = { 62 };
+    assertEqual(list, arrayH, size - 7);
+
     ASSERT_EQUAL(getValue(getFirst(list)), 62);
 
     ASSERT_FALSE(removeElement(list, -1));
