@@ -2,7 +2,7 @@ name: Build And Test
 
 on:
   push:
-    branches: [ "main", "main-hw2-and-hw3" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -21,16 +21,16 @@ jobs:
 
     - name: Build
       env:
-          HW_CMAKE: cmake
-          HW_CMAKE_COMPILER: gcc
-          HW_CMAKE_GENERATOR: "Unix Makefiles"
-          HW_EXE_EXTENSION: none
+        HW_CMAKE: cmake
+        HW_CMAKE_COMPILER: gcc
+        HW_CMAKE_GENERATOR: "Unix Makefiles"
+        HW_EXE_EXTENSION: none
       run: bash build.sh buildAll --clear --release
 
     - name: Test
       env:
-          HW_CMAKE: cmake
-          HW_CMAKE_COMPILER: gcc
-          HW_CMAKE_GENERATOR: "Unix Makefiles"
-          HW_EXE_EXTENSION: none
+        HW_CMAKE: cmake
+        HW_CMAKE_COMPILER: gcc
+        HW_CMAKE_GENERATOR: "Unix Makefiles"
+        HW_EXE_EXTENSION: none
       run: bash build.sh testAll --clear --release
