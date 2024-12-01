@@ -16,15 +16,15 @@ static bool tryExtendArrayByOne(void **elements, int count, int *capacity) {
     return true;
 }
 
-#pragma region NodeHashtable
-
 typedef struct {
     GraphNode *node;
     int distance;
-} NodeHashtableData;
+} NodeData;
+
+#pragma region NodeHashtable
 
 typedef struct {
-    NodeHashtableData *data;
+    NodeData *data;
     int count;
     int capacity;
 } Bucket;
@@ -68,7 +68,7 @@ static bool createHashtable(NodeHashtable **hashtable, int capacity) {
         Bucket bucket = newHashtable->buckets[i];
         bucket.count = 0;
         bucket.capacity = 8;
-        bucket.data = calloc(bucket.capacity, sizeof(NodeHashtableData));
+        bucket.data = calloc(bucket.capacity, sizeof(NodeData));
         if (bucket.data == NULL) {
             failed = false;
             break;
@@ -176,7 +176,7 @@ bool moveNext(HashtableIterator *iterator) {
     return false;
 }
 
-NodeHashtableData getCurrent(HashtableIterator iterator) {
+NodeData getCurrent(HashtableIterator iterator) {
     return iterator.hashtable->buckets[iterator.bucketIndex].data[iterator.listIndex];
 }
 
@@ -193,7 +193,7 @@ void disposeHashtable(NodeHashtable *hashtable) {
 #pragma region Queue
 
 typedef struct QNode {
-    NodeHashtableData data;
+    NodeData data;
     struct QNode *next;
 } QNode;
 
@@ -209,7 +209,7 @@ bool createQueue(Queue **queue) {
     return true;
 }
 
-bool enqueue(Queue *queue, NodeHashtableData data) {
+bool enqueue(Queue *queue, NodeData data) {
     QNode *node = malloc(sizeof(QNode));
     if (node == NULL) {
         return false;
@@ -251,7 +251,7 @@ bool isEmpty(Queue *queue) {
     return true;
 }
 
-bool dequeueWithMinDistance(Queue *queue, NodeHashtableData *data) {
+bool dequeueWithMinDistance(Queue *queue, NodeData *data) {
     if (!isEmpty(queue)) {
         return false;
     }
@@ -370,7 +370,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
     bool failed = false;
     for (int i = 0; i < capitalsCount; ++i) {
-        NodeHashtableData data = { .node = capitals[i], .distance = 0 };
+        NodeData data = { .node = capitals[i], .distance = 0 };
 
         if (!createQueue(&queues[i])) {
             failed = true;
@@ -419,7 +419,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
         step %= capitalsCount;
         Queue *countryQueue = queues[step];
 
-        NodeHashtableData closestData = { 0 };
+        NodeData closestData = { 0 };
         bool queueIsEmpty = false;
         while (true) {
             if (!dequeueWithMinDistance(countryQueue, &closestData)) {
@@ -447,7 +447,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
         HashtableIterator iterator = getIterator(closestNode->neighbors);
         while (moveNext(&iterator)) {
-            NodeHashtableData neighborData = getCurrent(iterator);
+            NodeData neighborData = getCurrent(iterator);
             GraphNode *neighbor = neighborData.node;
 
             if (getDistanceFromHashtable(capturedCities, neighbor, NULL)) {
@@ -455,7 +455,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             }
 
             int neighborDistanceToCapital = distanceToCapital + neighborData.distance;
-            if (!enqueue(countryQueue, (NodeHashtableData) { .node = neighbor, .distance = neighborDistanceToCapital })) {
+            if (!enqueue(countryQueue, (NodeData) { .node = neighbor, .distance = neighborDistanceToCapital })) {
                 failed = true;
                 break;
             }
