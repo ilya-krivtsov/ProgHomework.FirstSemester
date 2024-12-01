@@ -209,37 +209,37 @@ bool createQueue(Queue **queue) {
     return true;
 }
 
-bool enqueue(Queue *queue, NodeData data) {
-    QNode *node = malloc(sizeof(QNode));
-    if (node == NULL) {
+bool enqueue(Queue *queue, GraphNode *node, int distance) {
+    QNode *qnode = malloc(sizeof(QNode));
+    if (qnode == NULL) {
         return false;
     }
 
-    node->data = data;
-    node->next = NULL;
+    qnode->data = (NodeData){ .node = node, .distance = distance };
+    qnode->next = NULL;
 
     if (queue->first == NULL) {
-        queue->first = node;
+        queue->first = qnode;
         return true;
     }
 
-    if (data.distance < queue->first->data.distance) {
-        node->next = queue->first;
-        queue->first = node;
+    if (distance < queue->first->data.distance) {
+        qnode->next = queue->first;
+        queue->first = qnode;
         return true;
     }
 
     QNode *last = queue->first;
     while (last->next != NULL) {
-        if (last->next->data.distance > data.distance) {
+        if (last->next->data.distance > distance) {
             break;
         }
 
         last = last->next;
     }
 
-    node->next = last->next;
-    last->next = node;
+    qnode->next = last->next;
+    last->next = qnode;
 
     return true;
 }
@@ -251,14 +251,20 @@ bool isEmpty(Queue *queue) {
     return true;
 }
 
-bool dequeueWithMinDistance(Queue *queue, NodeData *data) {
+bool dequeueWithMinDistance(Queue *queue, GraphNode **node, int *distance) {
     if (!isEmpty(queue)) {
         return false;
     }
 
     QNode *first = queue->first;
 
-    *data = first->data;
+    if (node != NULL) {
+        *node = first->data.node;
+    }
+
+    if (distance != NULL) {
+        *distance = first->data.distance;
+    }
 
     queue->first = first->next;
 
@@ -370,8 +376,6 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
     bool failed = false;
     for (int i = 0; i < capitalsCount; ++i) {
-        NodeData data = { .node = capitals[i], .distance = 0 };
-
         if (!createQueue(&queues[i])) {
             failed = true;
             break;
@@ -382,12 +386,12 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             break;
         }
 
-        if (!enqueue(queues[i], data)) {
+        if (!enqueue(queues[i], capitals[i], 0)) {
             failed = true;
             break;
         }
 
-        if (addDistanceToHashtable(countriesWithDistances[i], data.node, data.distance, NULL)) {
+        if (addDistanceToHashtable(countriesWithDistances[i], capitals[i], 0, NULL)) {
             failed = true;
             break;
         }
@@ -419,15 +423,15 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
         step %= capitalsCount;
         Queue *countryQueue = queues[step];
 
-        NodeData closestData = { 0 };
+        GraphNode *closestNode = NULL;
         bool queueIsEmpty = false;
         while (true) {
-            if (!dequeueWithMinDistance(countryQueue, &closestData)) {
+            if (!dequeueWithMinDistance(countryQueue, &closestNode, NULL)) {
                 queueIsEmpty = true;
                 break;
             }
 
-            if (!getDistanceFromHashtable(capturedCities, closestData.node, NULL)) {
+            if (!getDistanceFromHashtable(capturedCities, closestNode, NULL)) {
                 queueIsEmpty = false;
                 break;
             }
@@ -436,8 +440,6 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
         if (queueIsEmpty) {
             continue;
         }
-
-        GraphNode *closestNode = closestData.node;
 
         int distanceToCapital = 0;
         if (!getDistanceFromHashtable(countriesWithDistances[step], closestNode, &distanceToCapital)) {
@@ -455,7 +457,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             }
 
             int neighborDistanceToCapital = distanceToCapital + neighborData.distance;
-            if (!enqueue(countryQueue, (NodeData) { .node = neighbor, .distance = neighborDistanceToCapital })) {
+            if (!enqueue(countryQueue, neighbor, neighborDistanceToCapital)) {
                 failed = true;
                 break;
             }
