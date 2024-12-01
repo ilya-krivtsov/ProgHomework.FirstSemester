@@ -190,65 +190,6 @@ void disposeHashtable(NodeHashtable *hashtable) {
 
 #pragma endregion
 
-typedef struct GraphNode {
-    NodeHashtable *neighbors;
-} GraphNode;
-
-bool createNode(GraphNode **node) {
-    GraphNode *newNode = malloc(sizeof(GraphNode));
-    if (newNode == NULL) {
-        return false;
-    }
-
-    if (!createHashtable(&newNode->neighbors, 64)) {
-        free(newNode);
-        return false;
-    }
-
-    *node = newNode;
-
-    return true;
-}
-
-static bool addNeighbor(GraphNode *node, GraphNode *neighbor, int distance) {
-    bool wasReplaced = false;
-    if (!addDistanceToHashtable(node->neighbors, neighbor, distance, &wasReplaced)) {
-        return false;
-    }
-
-    if (wasReplaced) {
-        // TODO: do something
-    }
-
-    return true;
-}
-
-bool connect(GraphNode *nodeA, GraphNode *nodeB, int distance) {
-    return addNeighbor(nodeA, nodeB, distance) && addNeighbor(nodeB, nodeA, distance);
-}
-
-bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length) {
-    *neighbors = calloc(node->neighbors->count, sizeof(GraphNode *));
-    if (*neighbors == NULL) {
-        return false;
-    }
-
-    int count = 0;
-    HashtableIterator iterator = getIterator(node->neighbors);
-    while (moveNext(&iterator)) {
-        neighbors[count] = getCurrent(iterator).node;
-        ++count;
-    }
-
-    *length = count;
-    return true;
-}
-
-typedef struct Country {
-    GraphNode **nodes;
-    int count;
-} Country;
-
 #pragma region Queue
 
 typedef struct QNode {
@@ -340,6 +281,65 @@ void disposeQueue(Queue *queue) {
 }
 
 #pragma endregion
+
+typedef struct GraphNode {
+    NodeHashtable *neighbors;
+} GraphNode;
+
+bool createNode(GraphNode **node) {
+    GraphNode *newNode = malloc(sizeof(GraphNode));
+    if (newNode == NULL) {
+        return false;
+    }
+
+    if (!createHashtable(&newNode->neighbors, 64)) {
+        free(newNode);
+        return false;
+    }
+
+    *node = newNode;
+
+    return true;
+}
+
+static bool addNeighbor(GraphNode *node, GraphNode *neighbor, int distance) {
+    bool wasReplaced = false;
+    if (!addDistanceToHashtable(node->neighbors, neighbor, distance, &wasReplaced)) {
+        return false;
+    }
+
+    if (wasReplaced) {
+        // TODO: do something
+    }
+
+    return true;
+}
+
+bool connect(GraphNode *nodeA, GraphNode *nodeB, int distance) {
+    return addNeighbor(nodeA, nodeB, distance) && addNeighbor(nodeB, nodeA, distance);
+}
+
+bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length) {
+    *neighbors = calloc(node->neighbors->count, sizeof(GraphNode *));
+    if (*neighbors == NULL) {
+        return false;
+    }
+
+    int count = 0;
+    HashtableIterator iterator = getIterator(node->neighbors);
+    while (moveNext(&iterator)) {
+        neighbors[count] = getCurrent(iterator).node;
+        ++count;
+    }
+
+    *length = count;
+    return true;
+}
+
+typedef struct Country {
+    GraphNode **nodes;
+    int count;
+} Country;
 
 bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCount) {
     NodeHashtable *capturedCities = NULL;
