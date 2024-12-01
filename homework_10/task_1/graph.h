@@ -6,7 +6,7 @@ bool createNode(GraphNode **node);
 
 bool connect(GraphNode *nodeA, GraphNode *nodeB, int distance);
 
-bool getAllNeighbors(GraphNode *node, GraphNode **neighbors, int *length);
+bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length);
 
 typedef struct Country Country;
 

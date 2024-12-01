@@ -227,7 +227,7 @@ bool connect(GraphNode *nodeA, GraphNode *nodeB, int distance) {
     return addNeighbor(nodeA, nodeB, distance) && addNeighbor(nodeB, nodeA, distance);
 }
 
-bool getAllNeighbors(GraphNode *node, GraphNode **neighbors, int *length) {
+bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length) {
     *neighbors = calloc(node->neighbors->count, sizeof(GraphNode *));
     if (*neighbors == NULL) {
         return false;
