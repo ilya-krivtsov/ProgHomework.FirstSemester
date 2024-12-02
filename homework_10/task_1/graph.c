@@ -381,22 +381,31 @@ void disposeNode(GraphNode *node) {
 typedef struct Country {
     GraphNode **nodes;
     int count;
+    int capacity;
 } Country;
 
 bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCount) {
+    *countries = calloc(capitalsCount, sizeof(Country *));
+    if (*countries == NULL) {
+        return false;
+    }
+
     NodeHashtable *capturedCities = NULL;
     if (!createHashtable(&capturedCities, 64)) {
+        free(*countries);
         return false;
     }
 
     Queue **queues = calloc(capitalsCount, sizeof(Queue *));
     if (queues == NULL) {
+        free(*countries);
         disposeHashtable(capturedCities);
         return false;
     }
 
     NodeHashtable **countriesWithDistances = calloc(capitalsCount, sizeof(NodeHashtable *));
     if (countries == NULL) {
+        free(*countries);
         disposeHashtable(capturedCities);
         free(queues);
         return false;
@@ -404,6 +413,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
     int *nodesPerCountry = calloc(capitalsCount, sizeof(int));
     if (nodesPerCountry == NULL) {
+        free(*countries);
         disposeHashtable(capturedCities);
         free(queues);
         free(countriesWithDistances);
@@ -431,13 +441,31 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             failed = true;
             break;
         }
+
+        Country *country = calloc(1, sizeof(Country));
+        if (country == NULL) {
+            failed = true;
+            break;
+        }
+
+        country->count = 0;
+        country->capacity = 8;
+        country->nodes = calloc(country->capacity, sizeof(GraphNode *));
+        if (country->nodes == NULL) {
+            failed = true;
+            break;
+        }
+
+        (*countries)[i] = country;
     }
 
     if (failed) {
         for (int i = 0; i < capitalsCount; ++i) {
+            disposeCountry((*countries)[i]);
             disposeQueue(queues[i]);
             disposeHashtable(countriesWithDistances[i]);
         }
+        free(*countries);
         disposeHashtable(capturedCities);
         return false;
     }
@@ -514,6 +542,13 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
         }
 
         ++nodesPerCountry[step];
+        Country *country = (*countries)[step];
+        if (!tryExtendArrayByOne((void **)&country->nodes, country->count, &country->capacity, sizeof(GraphNode *))) {
+            failed = true;
+            break;
+        }
+        country->nodes[country->count] = closestNode;
+        ++country->count;
     }
 
     for (int i = 0; i < capitalsCount; ++i) {
@@ -524,43 +559,13 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
     if (failed) {
         for (int i = 0; i < capitalsCount; ++i) {
+            disposeCountry((*countries)[i]);
             disposeHashtable(countriesWithDistances[i]);
         }
+        free(*countries);
         free(countriesWithDistances);
         free(nodesPerCountry);
         return false;
-    }
-
-    *countries = calloc(capitalsCount, sizeof(Country *));
-    if (*countries == NULL) {
-        for (int i = 0; i < capitalsCount; ++i) {
-            disposeHashtable(countriesWithDistances[i]);
-        }
-        free(countriesWithDistances);
-        free(nodesPerCountry);
-        return false;
-    }
-
-    for (int i = 0; i < capitalsCount; ++i) {
-        Country *country = calloc(1, sizeof(Country));
-        if (country == NULL) {
-            failed = true;
-            break;
-        }
-
-        country->count = nodesPerCountry[i];
-        country->nodes = calloc(country->count, sizeof(GraphNode *));
-        if (country->nodes == NULL) {
-            failed = true;
-            break;
-        }
-        HashtableIterator iterator = getIterator(countriesWithDistances[i]);
-        int index = 0;
-        while (moveNext(&iterator)) {
-            country->nodes[index] = getCurrent(iterator).node;
-            ++index;
-        }
-        (*countries)[i] = country;
     }
 
     for (int i = 0; i < capitalsCount; ++i) {
@@ -571,12 +576,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
     if (failed) {
         for (int i = 0; i < capitalsCount; ++i) {
-            Country *country = (*countries)[i];
-            if (country == NULL) {
-                continue;
-            }
-            free(country->nodes);
-            free(country);
+            disposeCountry((*countries)[i]);
         }
         free(*countries);
         return false;
