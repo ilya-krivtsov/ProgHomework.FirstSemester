@@ -524,17 +524,17 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             }
 
             int neighborDistanceToCapital = distanceToCapital + neighborData.distance;
-            if (!enqueue(countryQueue, neighbor, neighborDistanceToCapital)) {
-                failed = true;
-                break;
-            }
-
             int storedDistance = 0;
             if (getDistanceFromHashtable(countriesWithDistances[step], neighbor, &storedDistance)) {
                 neighborDistanceToCapital = neighborDistanceToCapital < storedDistance ? neighborDistanceToCapital : storedDistance;
             }
 
             if (!addDistanceToHashtable(countriesWithDistances[step], neighbor, neighborDistanceToCapital)) {
+                failed = true;
+                break;
+            }
+
+            if (!enqueue(countryQueue, neighbor, neighborDistanceToCapital)) {
                 failed = true;
                 break;
             }
