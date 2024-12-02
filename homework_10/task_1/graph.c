@@ -21,16 +21,44 @@ typedef struct {
     int distance;
 } NodeData;
 
-#pragma region NodeHashtable
-
 typedef struct {
     NodeData *data;
     int count;
     int capacity;
-} Bucket;
+} NodeList;
+
+bool createList(NodeList *list) {
+    list->count = 0;
+    list->capacity = 8;
+    list->data = calloc(list->capacity, sizeof(NodeData));
+    return list->data == NULL;
+}
+
+bool addToList(NodeList *list, GraphNode *node, int distance) {
+    if (!tryExtendArrayByOne((void**)&list->data, list->count, &list->capacity)) {
+        return false;
+    }
+
+    list->data[list->count].node = node;
+    list->data[list->count].distance = distance;
+
+    ++list->count;
+    return true;
+}
+
+bool contains(NodeList list, GraphNode *node) {
+    for (int i = 0; i < list.count; ++i) {
+        if (list.data[i].node == node) {
+            return true;
+        }
+    }
+    return false;
+}
+
+#pragma region NodeHashtable
 
 typedef struct {
-    Bucket *buckets;
+    NodeList *buckets;
     int count;
     int capacity;
 } NodeHashtable;
@@ -74,7 +102,7 @@ static bool createHashtable(NodeHashtable **hashtable, int capacity) {
 
     newHashtable->count = 0;
     newHashtable->capacity = capacity;
-    newHashtable->buckets = calloc(newHashtable->capacity, sizeof(Bucket));
+    newHashtable->buckets = calloc(newHashtable->capacity, sizeof(NodeList));
 
     if (newHashtable->buckets == NULL) {
         free(newHashtable);
@@ -83,12 +111,8 @@ static bool createHashtable(NodeHashtable **hashtable, int capacity) {
 
     bool failed = false;
     for (int i = 0; i < newHashtable->capacity; ++i) {
-        Bucket bucket = newHashtable->buckets[i];
-        bucket.count = 0;
-        bucket.capacity = 8;
-        bucket.data = calloc(bucket.capacity, sizeof(NodeData));
-        if (bucket.data == NULL) {
-            failed = false;
+        if (!createList(&newHashtable->buckets[i])) {
+            failed = true;
             break;
         }
     }
@@ -134,7 +158,7 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
     }
 
     int bucketIndex = (size_t)node % hashtable->capacity;
-    Bucket bucket = hashtable->buckets[bucketIndex];
+    NodeList bucket = hashtable->buckets[bucketIndex];
 
     for (int i = 0; i < bucket.count; ++i) {
         if (bucket.data[i].node == node) {
@@ -165,7 +189,7 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
 
 bool getDistanceFromHashtable(NodeHashtable *hashtable, GraphNode *node, int *distance) {
     int bucketIndex = (size_t)node % hashtable->capacity;
-    Bucket bucket = hashtable->buckets[bucketIndex];
+    NodeList bucket = hashtable->buckets[bucketIndex];
 
     for (int i = 0; i < bucket.count; ++i) {
         if (bucket.data[i].node == node) {
@@ -288,7 +312,7 @@ void disposeQueue(Queue *queue) {
 #pragma endregion
 
 typedef struct GraphNode {
-    NodeHashtable *neighbors;
+    NodeList neighbors;
 } GraphNode;
 
 bool createNode(GraphNode **node) {
@@ -297,7 +321,7 @@ bool createNode(GraphNode **node) {
         return false;
     }
 
-    if (!createHashtable(&newNode->neighbors, 64)) {
+    if (!createList(&newNode->neighbors)) {
         free(newNode);
         return false;
     }
@@ -307,34 +331,35 @@ bool createNode(GraphNode **node) {
     return true;
 }
 
-static bool addNeighbor(GraphNode *node, GraphNode *neighbor, int distance) {
-    bool wasReplaced = false;
-    if (!addDistanceToHashtable(node->neighbors, neighbor, distance, &wasReplaced)) {
-        return false;
+static ConnectionResult addNeighbor(GraphNode *node, GraphNode *neighbor, int distance) {
+    if (contains(node->neighbors, neighbor)) {
+        return CONNECTION_ALREADY_EXISTS;
     }
 
-    if (wasReplaced) {
-        // TODO: do something
+    if (!addToList(&node->neighbors, neighbor, distance)) {
+        return CONNECTION_ALLOCATION_ERROR;
     }
 
-    return true;
+    return CONNECTION_OK;
 }
 
-bool connect(GraphNode *nodeA, GraphNode *nodeB, int distance) {
-    return addNeighbor(nodeA, nodeB, distance) && addNeighbor(nodeB, nodeA, distance);
+ConnectionResult connect(GraphNode *nodeA, GraphNode *nodeB, int distance) {
+    ConnectionResult result = addNeighbor(nodeA, nodeB, distance);
+    if (result != CONNECTION_OK) {
+        return result;
+    }
+    return addNeighbor(nodeB, nodeA, distance);
 }
 
 bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length) {
-    *neighbors = calloc(node->neighbors->count, sizeof(GraphNode *));
+    int count = node->neighbors.count;
+    *neighbors = calloc(count, sizeof(GraphNode *));
     if (*neighbors == NULL) {
         return false;
     }
 
-    int count = 0;
-    HashtableIterator iterator = getIterator(node->neighbors);
-    while (moveNext(&iterator)) {
-        neighbors[count] = getCurrent(iterator).node;
-        ++count;
+    for (int i = 0; i < count; ++i) {
+        (*neighbors)[count] = node->neighbors.data[i].node;
     }
 
     *length = count;
@@ -446,9 +471,8 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             break;
         }
 
-        HashtableIterator iterator = getIterator(closestNode->neighbors);
-        while (moveNext(&iterator)) {
-            NodeData neighborData = getCurrent(iterator);
+        for (int i = 0; i < closestNode->neighbors.count; ++i) {
+            NodeData neighborData = closestNode->neighbors.data[i];
             GraphNode *neighbor = neighborData.node;
 
             if (getDistanceFromHashtable(capturedCities, neighbor, NULL)) {

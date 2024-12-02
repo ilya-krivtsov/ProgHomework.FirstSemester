@@ -1,10 +1,16 @@
 #pragma once
 
+typedef enum {
+    CONNECTION_OK,
+    CONNECTION_ALLOCATION_ERROR,
+    CONNECTION_ALREADY_EXISTS
+} ConnectionResult;
+
 typedef struct GraphNode GraphNode;
 
 bool createNode(GraphNode **node);
 
-bool connect(GraphNode *nodeA, GraphNode *nodeB, int distance);
+ConnectionResult connect(GraphNode *nodeA, GraphNode *nodeB, int distance);
 
 bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length);
 
