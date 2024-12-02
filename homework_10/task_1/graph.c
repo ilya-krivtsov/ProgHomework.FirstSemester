@@ -529,13 +529,12 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
                 break;
             }
 
-            int newDistance = neighborDistanceToCapital;
             int storedDistance = 0;
             if (getDistanceFromHashtable(countriesWithDistances[step], neighbor, &storedDistance)) {
-                newDistance = newDistance < storedDistance ? newDistance : storedDistance;
+                neighborDistanceToCapital = neighborDistanceToCapital < storedDistance ? neighborDistanceToCapital : storedDistance;
             }
 
-            if (!addDistanceToHashtable(countriesWithDistances[step], neighbor, newDistance)) {
+            if (!addDistanceToHashtable(countriesWithDistances[step], neighbor, neighborDistanceToCapital)) {
                 failed = true;
                 break;
             }
