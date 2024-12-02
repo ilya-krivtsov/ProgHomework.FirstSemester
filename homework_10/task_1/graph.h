@@ -14,8 +14,12 @@ ConnectionResult connect(GraphNode *nodeA, GraphNode *nodeB, int distance);
 
 bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length);
 
+void disposeNode(GraphNode *node);
+
 typedef struct Country Country;
 
 bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCount);
 
 bool getAllCities(Country *country, GraphNode **nodes, int *length);
+
+void disposeCountry(Country *country);

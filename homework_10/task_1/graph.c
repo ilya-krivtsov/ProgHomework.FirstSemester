@@ -368,6 +368,15 @@ bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length) {
     return true;
 }
 
+void disposeNode(GraphNode *node) {
+    if (node == NULL) {
+        return;
+    }
+
+    free(node->neighbors.data);
+    free(node);
+}
+
 typedef struct Country {
     GraphNode **nodes;
     int count;
@@ -586,4 +595,13 @@ bool getAllCities(Country *country, GraphNode **nodes, int *length) {
     *length = country->count;
 
     return true;
+}
+
+void disposeCountry(Country *country) {
+    if (country == NULL) {
+        return;
+    }
+
+    free(country->nodes);
+    free(country);
 }
