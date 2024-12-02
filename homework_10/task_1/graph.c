@@ -591,7 +591,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
     return true;
 }
 
-bool getAllCities(Country *country, GraphNode **nodes, int *length) {
+bool getAllCities(Country *country, GraphNode ***nodes, int *length) {
     *nodes = calloc(country->count, sizeof(GraphNode *));
     if (*nodes == NULL) {
         return false;
