@@ -193,6 +193,8 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
     bucket.data[bucket.count].distance = distance;
 
     ++bucket.count;
+    ++hashtable->count;
+    hashtable->buckets[bucketIndex] = bucket;
 
     return true;
 }
