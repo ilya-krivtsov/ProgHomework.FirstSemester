@@ -41,6 +41,24 @@ typedef struct {
     int listIndex;
 } HashtableIterator;
 
+HashtableIterator getIterator(NodeHashtable *hashtable) {
+    return (HashtableIterator) { .hashtable = hashtable, .bucketIndex = 0, .listIndex = 0 };
+}
+
+bool moveNext(HashtableIterator *iterator) {
+    for (; iterator->bucketIndex < iterator->hashtable->capacity; ++iterator->bucketIndex) {
+        NodeList bucket = iterator->hashtable->buckets[iterator->bucketIndex];
+        for (; iterator->listIndex < bucket.count; ++iterator->listIndex) {
+            return true;
+        }
+    }
+    return false;
+}
+
+NodeData getCurrent(HashtableIterator iterator) {
+    return iterator.hashtable->buckets[iterator.bucketIndex].data[iterator.listIndex];
+}
+
 static void disposeBuckets(NodeHashtable *hashtable) {
     for (int i = 0; i < hashtable->capacity; ++i) {
         free(hashtable->buckets[i].data);
@@ -160,24 +178,6 @@ bool getDistanceFromHashtable(NodeHashtable *hashtable, GraphNode *node, int *di
     }
 
     return false;
-}
-
-HashtableIterator getIterator(NodeHashtable *hashtable) {
-    return (HashtableIterator) { .hashtable = hashtable, .bucketIndex = 0, .listIndex = 0 };
-}
-
-bool moveNext(HashtableIterator *iterator) {
-    for (; iterator->bucketIndex < iterator->hashtable->capacity; ++iterator->bucketIndex) {
-        Bucket bucket = iterator->hashtable->buckets[iterator->bucketIndex];
-        for (; iterator->listIndex < bucket.count; ++iterator->listIndex) {
-            return true;
-        }
-    }
-    return false;
-}
-
-NodeData getCurrent(HashtableIterator iterator) {
-    return iterator.hashtable->buckets[iterator.bucketIndex].data[iterator.listIndex];
 }
 
 void disposeHashtable(NodeHashtable *hashtable) {
