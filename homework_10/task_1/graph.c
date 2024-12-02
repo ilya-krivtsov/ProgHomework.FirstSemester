@@ -468,6 +468,8 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             disposeHashtable(countriesWithDistances[i]);
         }
         free(*countries);
+        free(queues);
+        free(countriesWithDistances);
         disposeHashtable(capturedCities);
         return false;
     }
@@ -566,14 +568,13 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
         }
         free(*countries);
         free(countriesWithDistances);
-        free(nodesPerCountry);
         return false;
     }
 
     for (int i = 0; i < capitalsCount; ++i) {
         disposeHashtable(countriesWithDistances[i]);
-        free(countriesWithDistances);
     }
+    free(countriesWithDistances);
     free(nodesPerCountry);
 
     if (failed) {
