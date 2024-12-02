@@ -136,7 +136,7 @@ static bool createHashtable(NodeHashtable **hashtable, int capacity) {
     return true;
 }
 
-bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int distance, bool *replacedValue);
+bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int distance);
 
 static bool expandHashtable(NodeHashtable *hashtable) {
     int newCapacity = hashtable->capacity * 4;
@@ -149,7 +149,7 @@ static bool expandHashtable(NodeHashtable *hashtable) {
     HashtableIterator iterator = getIterator(hashtable);
     while (moveNext(&iterator)) {
         NodeData data = getCurrent(iterator);
-        addDistanceToHashtable(newHashtable, data.node, data.distance, NULL);
+        addDistanceToHashtable(newHashtable, data.node, data.distance);
     }
 
     disposeBuckets(hashtable);
@@ -166,7 +166,7 @@ static unsigned int getHashCode(GraphNode *node) {
     return (size_t)node / sizeof(GraphNode);
 }
 
-bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int distance, bool *replacedValue) {
+bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int distance) {
     if ((float)hashtable->count / hashtable->capacity > 4.0) {
         expandHashtable(hashtable);
     }
@@ -176,10 +176,6 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
 
     for (int i = 0; i < bucket.count; ++i) {
         if (bucket.data[i].node == node) {
-            if (replacedValue != NULL) {
-                *replacedValue = true;
-            }
-
             bucket.data[i].distance = distance;
             return true;
         }
@@ -193,10 +189,6 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
     bucket.data[bucket.count].distance = distance;
 
     ++bucket.count;
-
-    if (replacedValue != NULL) {
-        *replacedValue = false;
-    }
 
     return true;
 }
@@ -435,7 +427,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
             break;
         }
 
-        if (addDistanceToHashtable(countriesWithDistances[i], capitals[i], 0, NULL)) {
+        if (!addDistanceToHashtable(countriesWithDistances[i], capitals[i], 0)) {
             failed = true;
             break;
         }
@@ -511,7 +503,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
                 newDistance = newDistance < storedDistance ? newDistance : storedDistance;
             }
 
-            if (!addDistanceToHashtable(countriesWithDistances[step], neighbor, newDistance, NULL)) {
+            if (!addDistanceToHashtable(countriesWithDistances[step], neighbor, newDistance)) {
                 failed = true;
                 break;
             }
