@@ -113,11 +113,10 @@ static bool expandHashtable(NodeHashtable *hashtable) {
         return false;
     }
 
-    for (int i = 0; i < hashtable->count; ++i) {
-        Bucket bucket = hashtable->buckets[i];
-        for (int j = 0; j < bucket.count; ++j) {
-            addDistanceToHashtable(newHashtable, bucket.data[j].node, bucket.data[j].distance, NULL);
-        }
+    HashtableIterator iterator = getIterator(hashtable);
+    while (moveNext(&iterator)) {
+        NodeData data = getCurrent(iterator);
+        addDistanceToHashtable(newHashtable, data.node, data.distance, NULL);
     }
 
     disposeBuckets(hashtable);
