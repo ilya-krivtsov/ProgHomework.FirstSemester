@@ -31,7 +31,7 @@ bool createList(NodeList *list) {
     list->count = 0;
     list->capacity = 8;
     list->data = calloc(list->capacity, sizeof(NodeData));
-    return list->data == NULL;
+    return list->data != NULL;
 }
 
 bool addToList(NodeList *list, GraphNode *node, int distance) {
@@ -268,14 +268,11 @@ bool enqueue(Queue *queue, GraphNode *node, int distance) {
 }
 
 bool isEmpty(Queue *queue) {
-    if (queue->first == NULL) {
-        return false;
-    }
-    return true;
+    return queue->first == NULL;
 }
 
 bool dequeueWithMinDistance(Queue *queue, GraphNode **node, int *distance) {
-    if (!isEmpty(queue)) {
+    if (isEmpty(queue)) {
         return false;
     }
 
