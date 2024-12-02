@@ -152,12 +152,17 @@ static bool expandHashtable(NodeHashtable *hashtable) {
     return true;
 }
 
+static unsigned int getHashCode(GraphNode *node) {
+    // nodes are more likely to be allocated in bulk, so divide address by node size
+    return (size_t)node / sizeof(GraphNode);
+}
+
 bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int distance, bool *replacedValue) {
     if ((float)hashtable->count / hashtable->capacity > 4.0) {
         expandHashtable(hashtable);
     }
 
-    int bucketIndex = (size_t)node % hashtable->capacity;
+    int bucketIndex = getHashCode(node) % hashtable->capacity;
     NodeList bucket = hashtable->buckets[bucketIndex];
 
     for (int i = 0; i < bucket.count; ++i) {
@@ -188,7 +193,7 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
 }
 
 bool getDistanceFromHashtable(NodeHashtable *hashtable, GraphNode *node, int *distance) {
-    int bucketIndex = (size_t)node % hashtable->capacity;
+    int bucketIndex = getHashCode(node) % hashtable->capacity;
     NodeList bucket = hashtable->buckets[bucketIndex];
 
     for (int i = 0; i < bucket.count; ++i) {
