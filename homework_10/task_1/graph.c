@@ -70,16 +70,25 @@ typedef struct {
 } HashtableIterator;
 
 HashtableIterator getIterator(NodeHashtable *hashtable) {
-    return (HashtableIterator) { .hashtable = hashtable, .bucketIndex = 0, .listIndex = 0 };
+    return (HashtableIterator) { .hashtable = hashtable, .bucketIndex = -1, .listIndex = -1 };
 }
 
 bool moveNext(HashtableIterator *iterator) {
-    for (; iterator->bucketIndex < iterator->hashtable->capacity; ++iterator->bucketIndex) {
-        NodeList bucket = iterator->hashtable->buckets[iterator->bucketIndex];
-        for (; iterator->listIndex < bucket.count; ++iterator->listIndex) {
-            return true;
+    while (iterator->bucketIndex < iterator->hashtable->capacity) {
+        ++iterator->bucketIndex;
+        if (iterator->bucketIndex >= iterator->hashtable->capacity) {
+            return false;
         }
+        NodeList bucket = iterator->hashtable->buckets[iterator->bucketIndex];
+        while (iterator->listIndex < bucket.count) {
+            ++iterator->listIndex;
+            if (iterator->listIndex < bucket.count) {
+                return true;
+            }
+        }
+        iterator->listIndex = -1;
     }
+
     return false;
 }
 
