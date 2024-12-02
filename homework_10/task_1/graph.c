@@ -27,6 +27,10 @@ typedef struct {
     int capacity;
 } NodeList;
 
+typedef struct GraphNode {
+    NodeList neighbors;
+} GraphNode;
+
 bool createList(NodeList *list) {
     list->count = 0;
     list->capacity = 8;
@@ -313,10 +317,6 @@ void disposeQueue(Queue *queue) {
 }
 
 #pragma endregion
-
-typedef struct GraphNode {
-    NodeList neighbors;
-} GraphNode;
 
 bool createNode(GraphNode **node) {
     GraphNode *newNode = malloc(sizeof(GraphNode));
