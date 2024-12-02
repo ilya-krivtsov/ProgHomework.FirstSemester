@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-static bool tryExtendArrayByOne(void **elements, int count, int *capacity) {
+static bool tryExtendArrayByOne(void **elements, int count, int *capacity, int elementSize) {
     if (count + 1 >= *capacity) {
         *capacity *= 4;
-        void *newData = realloc(*elements, *capacity);
+        void *newData = realloc(*elements, *capacity * elementSize);
         if (newData == NULL) {
             return false;
         }
@@ -35,7 +35,7 @@ bool createList(NodeList *list) {
 }
 
 bool addToList(NodeList *list, GraphNode *node, int distance) {
-    if (!tryExtendArrayByOne((void**)&list->data, list->count, &list->capacity)) {
+    if (!tryExtendArrayByOne((void**)&list->data, list->count, &list->capacity, sizeof(NodeData))) {
         return false;
     }
 
@@ -176,7 +176,7 @@ bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int dista
         }
     }
 
-    if (!tryExtendArrayByOne((void**)&bucket.data, bucket.count, &bucket.capacity)) {
+    if (!tryExtendArrayByOne((void**)&bucket.data, bucket.count, &bucket.capacity, sizeof(NodeList))) {
         return false;
     }
 
