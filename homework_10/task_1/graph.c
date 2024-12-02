@@ -545,6 +545,10 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
         }
 
         ++nodesPerCountry[step];
+        if (!addDistanceToHashtable(capturedCities, closestNode, distanceToCapital)) {
+            failed = true;
+            break;
+        }
         Country *country = (*countries)[step];
         if (!tryExtendArrayByOne((void **)&country->nodes, country->count, &country->capacity, sizeof(GraphNode *))) {
             failed = true;
