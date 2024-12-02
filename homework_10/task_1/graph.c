@@ -511,6 +511,7 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
         int distanceToCapital = 0;
         if (!getDistanceFromHashtable(countriesWithDistances[step], closestNode, &distanceToCapital)) {
+            // unreachable
             failed = true;
             break;
         }
@@ -560,23 +561,10 @@ bool createCountries(GraphNode **capitals, Country ***countries, int capitalsCou
 
     for (int i = 0; i < capitalsCount; ++i) {
         disposeQueue(queues[i]);
+        disposeHashtable(countriesWithDistances[i]);
     }
     free(queues);
     disposeHashtable(capturedCities);
-
-    if (failed) {
-        for (int i = 0; i < capitalsCount; ++i) {
-            disposeCountry((*countries)[i]);
-            disposeHashtable(countriesWithDistances[i]);
-        }
-        free(*countries);
-        free(countriesWithDistances);
-        return false;
-    }
-
-    for (int i = 0; i < capitalsCount; ++i) {
-        disposeHashtable(countriesWithDistances[i]);
-    }
     free(countriesWithDistances);
     free(nodesPerCountry);
 
