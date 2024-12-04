@@ -66,7 +66,7 @@ void testGraph(const char *inputFilename, const char *expectedOutputFilename) {
     int nodeCount = 0;
     Country **countries = NULL;
     int countryCount = 0;
-    ASSERT_EQUAL(READ_OK, readFileFromFileAndCreateCountries(inputFile, &nodes, &nodeCount, &countries, &countryCount, NULL));
+    ASSERT_EQUAL(READ_OK, readGraphFromFileAndCreateCountries(inputFile, &nodes, &nodeCount, &countries, &countryCount, NULL));
     ASSERT_EQUAL(fclose(inputFile), 0);
 
     int expectedCountryCount = 0;

@@ -5,7 +5,7 @@
 
 #include "graph.h"
 
-ReadResult readFileFromFileAndCreateCountries(FILE *file, GraphNode ***nodes, int *nodeCount, Country ***countries, int *countryCount, FILE *warningAndErrorOutput) {
+ReadResult readGraphFromFileAndCreateCountries(FILE *file, GraphNode ***nodes, int *nodeCount, Country ***countries, int *countryCount, FILE *warningAndErrorOutput) {
     int storedNodeCount = 0;
     if (fscanf(file, "%d", &storedNodeCount) != 1) {
         if (warningAndErrorOutput != NULL) {

@@ -15,7 +15,7 @@ int main() {
     int nodeCount = 0;
     Country **countries = NULL;
     int countryCount = 0;
-    switch (readFileFromFileAndCreateCountries(file, &nodes, &nodeCount, &countries, &countryCount, stdout)) {
+    switch (readGraphFromFileAndCreateCountries(file, &nodes, &nodeCount, &countries, &countryCount, stdout)) {
     case READ_OK:
         break;
     case READ_ALLOCATION_ERROR:

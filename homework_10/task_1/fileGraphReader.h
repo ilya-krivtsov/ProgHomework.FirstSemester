@@ -10,4 +10,4 @@ typedef enum {
     READ_FILE_ERROR,
 } ReadResult;
 
-ReadResult readFileFromFileAndCreateCountries(FILE *file, GraphNode ***nodes, int *nodeCount, Country ***countries, int *countryCount, FILE *warningAndErrorOutput);
+ReadResult readGraphFromFileAndCreateCountries(FILE *file, GraphNode ***nodes, int *nodeCount, Country ***countries, int *countryCount, FILE *warningAndErrorOutput);
