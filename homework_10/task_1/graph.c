@@ -356,21 +356,6 @@ ConnectionResult connect(GraphNode *nodeA, GraphNode *nodeB, int distance) {
     return addNeighbor(nodeB, nodeA, distance);
 }
 
-bool getAllNeighbors(GraphNode *node, GraphNode ***neighbors, int *length) {
-    int count = node->neighbors.count;
-    *neighbors = calloc(count, sizeof(GraphNode *));
-    if (*neighbors == NULL) {
-        return false;
-    }
-
-    for (int i = 0; i < count; ++i) {
-        (*neighbors)[count] = node->neighbors.data[i].node;
-    }
-
-    *length = count;
-    return true;
-}
-
 void disposeNode(GraphNode *node) {
     if (node == NULL) {
         return;
