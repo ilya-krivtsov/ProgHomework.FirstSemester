@@ -53,13 +53,11 @@ void assertAddingAndRemoving(const char **keys, const char **values, int size) {
     }
 
     for (int i = 0; i < size; ++i) {
-        // ASSERT_EQUAL(getCount(dict), size);
         ASSERT_TRUE(containsKey(dict, keys[i]));
         ASSERT_STR(getValue(dict, keys[i]), values[i]);
     }
 
     for (int i = 0; i < size; ++i) {
-
         int index = (i + (size / 3)) % size;
         ASSERT_TRUE(removeFromDictionary(dict, keys[index]));
         ASSERT_FALSE(removeFromDictionary(dict, keys[index]));
