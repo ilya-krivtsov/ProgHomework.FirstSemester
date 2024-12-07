@@ -123,25 +123,14 @@ static Node *balanceNode(Node *node) {
 
         Node *newNode = rotateRightMajor(node);
 
-        newNode->left->balance = newNode->balance == 1 ? -1 : 0;
-        newNode->right->balance = newNode->balance == -1 ? 1 : 0;
+        newNode->right->balance = newNode->balance == 1 ? -1 : 0;
+        newNode->left->balance = newNode->balance == -1 ? 1 : 0;
         newNode->balance = 0;
 
         return newNode;
     }
 
     return node;
-}
-
-int getHeight(Node *node) {
-    if (node == NULL) {
-        return 0;
-    }
-
-    int left = getHeight(node->left);
-    int right = getHeight(node->right);
-
-    return (left > right ? left : right) + 1;
 }
 
 static Node *insertNode(Node *node, const char *key, const char *value, bool *continueAscending, bool *created) {
@@ -186,9 +175,6 @@ static Node *insertNode(Node *node, const char *key, const char *value, bool *co
 
         return node;
     }
-
-    // TODO: remove this
-    node->balance = (getHeight(node->left) - getHeight(node->right));
 
     if (node->balance == 0) {
         *continueAscending = false;
@@ -311,9 +297,6 @@ static Node *deleteNode(Node *node, const char *key, bool *continueAscending, bo
 
         --node->balance;
     }
-
-    // TODO: remove this
-    node->balance = (getHeight(node->left) - getHeight(node->right));
 
     if (abs(node->balance) == 1) {
         *continueAscending = false;
