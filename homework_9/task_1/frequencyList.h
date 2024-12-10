@@ -50,7 +50,7 @@ int getFrequency(FrequencyElement *element);
 /// @brief Sets string into an element
 /// @param element Element to set string into
 /// @param string String to set
-void setString(FrequencyElement *element, const char *string);
+bool setString(FrequencyElement *element, const char *string);
 
 /// @brief Sets frequency into an element
 /// @param element Element to set frequency into

@@ -118,9 +118,12 @@ bool addFrequency(FrequencyLookup *lookup, const char *string, int frequency) {
         return false;
     }
 
-    ++lookup->count;
-    setString(element, string);
+    if (!setString(element, string)) {
+        return false;
+    }
     setFrequency(element, frequency);
+
+    ++lookup->count;
     return true;
 }
 

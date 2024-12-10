@@ -87,9 +87,14 @@ int getFrequency(FrequencyElement *element) {
     return element->frequency;
 }
 
-void setString(FrequencyElement *element, const char *string) {
+bool setString(FrequencyElement *element, const char *string) {
+    char *newString = strdup(string);
+    if (newString == NULL) {
+        return false;
+    }
     free(element->string);
-    element->string = strdup(string);
+    element->string = newString;
+    return true;
 }
 
 void setFrequency(FrequencyElement *element, int frequency) {
