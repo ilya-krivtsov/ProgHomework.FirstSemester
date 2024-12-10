@@ -3,8 +3,8 @@
 #include "../../ctest/ctest.h"
 
 #include <stdbool.h>
+#include <stdlib.h>
 
-#include "stdio.h"
 #include "sortings.h"
 
 int main(int argc, const char *argv[]) {
