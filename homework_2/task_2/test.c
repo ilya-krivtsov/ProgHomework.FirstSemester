@@ -2,6 +2,8 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
+#include <stdbool.h>
+
 #include "stdio.h"
 #include "sortings.h"
 
