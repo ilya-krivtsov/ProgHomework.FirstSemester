@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stdbool.h"
+#include <stdbool.h>
 
 /// @brief Calculator that works with basic operations like
 /// addition, subtraction, multiplication and division

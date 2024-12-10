@@ -1,5 +1,6 @@
 #include "postfixCalc.h"
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 #include "../stack/stack.h"
