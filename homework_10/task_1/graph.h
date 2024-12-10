@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 typedef enum {
     CONNECTION_OK,
     CONNECTION_ALLOCATION_ERROR,
