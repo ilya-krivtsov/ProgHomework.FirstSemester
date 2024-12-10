@@ -1,7 +1,7 @@
 #include "frequencySearch.h"
 
 #include <stdbool.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 int partition(int *array, int left, int right) {
     int first = array[left], middle = array[(left + right) / 2], last = array[right];
