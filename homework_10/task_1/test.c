@@ -2,6 +2,8 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
+#include <stdlib.h>
+
 #include "graph.h"
 #include "fileGraphReader.h"
 
