@@ -43,7 +43,7 @@ void assertTwoFiles(const char *input, const char *expectedOutput, SortChoice ch
     FILE *expectedOutputFile = fopen(expectedOutput, "r");
     ASSERT_NOT_NULL(expectedOutputFile);
     FILE *realOutputFile = fopen(outputName, "r");
-    ASSERT_NOT_NULL(outputFile);
+    ASSERT_NOT_NULL(realOutputFile);
 
     while (!feof(expectedOutputFile) && !feof(realOutputFile)) {
         char expected = fgetc(expectedOutputFile);
