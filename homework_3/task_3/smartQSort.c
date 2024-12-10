@@ -1,5 +1,7 @@
 #include "smartQSort.h"
 
+#include <stdbool.h>
+
 void insertionSort(int *array, int left, int right) {
     for (int i = left + 1; i <= right; ++i) {
         for (int j = i - 1; j >= left; --j) {

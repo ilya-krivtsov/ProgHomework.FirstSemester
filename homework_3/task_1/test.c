@@ -2,7 +2,7 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
-#include <stdio.h>
+#include <stdlib.h>
 
 #include "frequencySearch.h"
 
