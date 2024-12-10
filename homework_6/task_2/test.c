@@ -2,6 +2,8 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
+#include <stdlib.h>
+
 #include "cyclicList.h"
 
 int main(int argc, const char *argv[]) {
