@@ -1,6 +1,7 @@
 #include "binaryAddition.h"
 
-#include "stdio.h"
+#include <stdbool.h>
+#include <stdio.h>
 
 int8_t addTwoNumbers(int8_t left, int8_t right, AdditionCallback callback) {
     const int bitWidth = sizeof(int8_t) * 8;
