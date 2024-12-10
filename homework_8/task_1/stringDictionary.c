@@ -205,7 +205,7 @@ bool addToDictionary(StringDictionary *dictionary, const char *key, const char *
     return created;
 }
 
-Node *findNode(Node *node, const char *key) {
+static Node *findNode(Node *node, const char *key) {
     if (node == NULL) {
         return NULL;
     }
@@ -326,7 +326,7 @@ bool removeFromDictionary(StringDictionary *dictionary, const char *key) {
     return found;
 }
 
-void disposeNodeRecursive(Node *node) {
+static void disposeNodeRecursive(Node *node) {
     if (node == NULL) {
         return;
     }
