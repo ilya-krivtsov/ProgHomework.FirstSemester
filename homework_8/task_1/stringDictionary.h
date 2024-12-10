@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 /// @brief Dictionary of `const char *` keys associated with `const char *` values
 typedef struct StringDictionary StringDictionary;
 
