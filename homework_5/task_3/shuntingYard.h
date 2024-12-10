@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 /// @brief Structure for converting infix notation to postfix (also known as Reverse Polish notation (PRN))
 typedef struct ShuntingYard ShuntingYard;
 
