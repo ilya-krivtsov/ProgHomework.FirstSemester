@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 /// @brief Dictionary of `int` keys associated with `char *` values
 typedef struct IntStringDictionary IntStringDictionary;
 
