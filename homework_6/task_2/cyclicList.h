@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 /// @brief Cyclic list element
 typedef struct ListElement ListElement;
 
