@@ -59,6 +59,8 @@ CTEST(smartQSortTests, randomArrayTest) {
 #define size 100
     int array[size];
 
+    srand(968475267);
+
     randomizeArray(array, size, -128, 128);
 
     sortAndAssert(array, size);
