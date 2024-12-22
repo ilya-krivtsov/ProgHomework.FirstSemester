@@ -57,7 +57,7 @@ void testAllCases(power power) {
     testRegularCases(power);
 }
 
-CTEST(powerTests, powerNaiiveTest) {
+CTEST(powerTests, powerNaiveTest) {
     testAllCases(powerNaive);
 }
 
