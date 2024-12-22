@@ -30,5 +30,5 @@ int main(void) {
 }
 
 #ifdef __MINGW64__
-// #pragma GCC diagnostic pop
+#pragma GCC diagnostic pop
 #endif
