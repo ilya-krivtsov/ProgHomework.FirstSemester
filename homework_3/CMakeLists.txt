@@ -1,4 +1,4 @@
-project(homework_4)
+project(homework_3)
 
 set(homeworkName "${PROJECT_NAME}")
 
