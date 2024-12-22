@@ -7,4 +7,5 @@ set(CMAKE_C_STANDARD_REQUIRED TRUE)
 add_compile_options(-Wall -Wextra)
 
 add_subdirectory(homework_2)
+add_subdirectory(homework_3)
 add_subdirectory(homework_4)
