@@ -11,7 +11,7 @@ typedef struct PostfixCalc {
 
 bool calcCreate(PostfixCalc **calc) {
     *calc = malloc(sizeof(PostfixCalc));
-    if (calc == NULL) {
+    if (*calc == NULL) {
         return false;
     }
 
