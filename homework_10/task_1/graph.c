@@ -241,10 +241,7 @@ typedef struct {
 
 bool createQueue(Queue **queue) {
     *queue = calloc(1, sizeof(Queue));
-    if (*queue == NULL) {
-        return false;
-    }
-    return true;
+    return *queue != NULL;
 }
 
 bool enqueue(Queue *queue, GraphNode *node, int distance) {
