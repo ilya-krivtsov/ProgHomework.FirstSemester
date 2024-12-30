@@ -173,7 +173,9 @@ static unsigned int getHashCode(GraphNode *node) {
 
 bool addDistanceToHashtable(NodeHashtable *hashtable, GraphNode *node, int distance) {
     if ((float)hashtable->count / hashtable->capacity > 4.0) {
-        expandHashtable(hashtable);
+        if (!expandHashtable(hashtable)) {
+            return false;
+        }
     }
 
     int bucketIndex = getHashCode(node) % hashtable->capacity;
