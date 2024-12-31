@@ -2,7 +2,9 @@
 #define CTEST_SEGFAULT
 #include "../../ctest/ctest.h"
 
-#include "stdio.h"
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "sortings.h"
 
 int main(int argc, const char *argv[]) {
